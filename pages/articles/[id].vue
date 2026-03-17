@@ -72,3 +72,4 @@ const formatted_date = computed(() =>
   article.value ? format_display_date(article.value.publishedAt) : ''
 )
 </script>
+ 

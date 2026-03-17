@@ -14,7 +14,7 @@
         <h2 class="text-lg font-semibold text-slate-900 line-clamp-2">
           {{ article.title }}
         </h2>
-        <p class="mt-1 text-sm text-slate-600 line-clamp-2">
+        <p class="mt-1 text-sm text-slate-600 line-clamp-2"> 
           {{ article.description }}
         </p>
         <p class="mt-2 text-xs text-slate-500">

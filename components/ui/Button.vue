@@ -15,7 +15,7 @@
  * Pure UI button. Variants: primary, secondary, ghost.
  */
 interface Props {
-  variant?: 'primary' | 'secondary' | 'ghost'
+  variant?: 'primary' | 'secondary' | 'ghost' 
   disabled?: boolean
 }
 

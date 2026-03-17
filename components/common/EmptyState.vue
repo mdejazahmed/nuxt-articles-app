@@ -12,7 +12,7 @@
 interface Props {
   title: string
   description?: string
-}
+} 
 
 defineProps<Props>()
 </script>

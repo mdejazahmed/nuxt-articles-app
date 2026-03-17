@@ -12,3 +12,4 @@
  * Pure UI loading spinner.
  */
 </script>
+ 

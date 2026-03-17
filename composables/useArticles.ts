@@ -17,7 +17,7 @@ const KEY_ARTICLES = 'articles'
  */
 export function useArticles() {
   const { data, pending, error, refresh } = useAsyncData(
-    KEY_ARTICLES,
+    KEY_ARTICLES, 
     async (): Promise<Article[]> => {
       const response = await get_articles()
       if (!is_api_success(response)) {

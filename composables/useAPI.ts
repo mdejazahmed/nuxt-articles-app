@@ -21,7 +21,7 @@ export async function get_articles(): Promise<ApiResponse<ArticlesResponseApi>> 
     const data = await $fetch<ArticlesResponseApi>(url, {
       timeout: DEFAULT_TIMEOUT_MS,
     })
-    return { data, error: null, status: 'success' }
+    return { data, error: null, status: 'success' } 
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : 'Failed to fetch articles'
     const code = err && typeof err === 'object' && 'statusCode' in err ? String((err as { statusCode: number }).statusCode) : undefined

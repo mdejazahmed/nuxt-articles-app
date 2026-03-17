@@ -14,7 +14,7 @@
 
 <script setup lang="ts">
 /**
- * User-friendly error message with optional retry.
+ * User-friendly error message with optional retry. 
  */
 interface Props {
   message: string

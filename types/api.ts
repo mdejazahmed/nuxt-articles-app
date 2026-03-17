@@ -25,3 +25,4 @@ export function is_api_error<T>(res: ApiResponse<T>): res is ApiResponseError {
 export function is_api_success<T>(res: ApiResponse<T>): res is ApiResponseSuccess<T> {
   return res.status === 'success'
 }
+ 

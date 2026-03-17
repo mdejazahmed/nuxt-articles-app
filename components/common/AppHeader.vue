@@ -13,7 +13,7 @@
           Home
         </NuxtLink>
       </nav>
-    </div>
+    </div> 
   </header>
 </template>
 

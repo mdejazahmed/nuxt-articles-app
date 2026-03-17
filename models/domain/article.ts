@@ -16,7 +16,7 @@ export interface Article {
   description: string
   author: string
   sourceName: string
-  url: string
+  url: string 
   urlToImage: string | null
   publishedAt: string
   content: string

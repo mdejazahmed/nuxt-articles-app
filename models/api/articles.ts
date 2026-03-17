@@ -16,7 +16,7 @@ export interface ArticleApi {
   url?: string | null
   urlToImage?: string | null
   publishedAt?: string | null
-  content?: string | null
+  content?: string | null 
 }
 
 export interface ArticlesResponseApi {

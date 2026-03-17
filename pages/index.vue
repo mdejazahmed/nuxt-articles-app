@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div> 
     <h1 class="mb-6 text-2xl font-bold text-slate-900">Latest articles</h1>
     <ul v-if="pending" class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
       <li v-for="i in 6" :key="i">
