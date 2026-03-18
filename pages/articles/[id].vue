@@ -9,10 +9,10 @@
       <NuxtLink to="/" class="mt-4 inline-block text-teal-600 hover:underline">Back to list</NuxtLink>
     </div>
     <article v-else class="rounded-lg border border-slate-200 bg-white shadow-sm">
-      <div v-if="article.urlToImage" class="aspect-video w-full overflow-hidden rounded-t-lg bg-slate-100">
-        <img
-          :src="article.urlToImage"
-          :alt="article.title"
+      <div class="aspect-video w-full overflow-hidden rounded-t-lg bg-slate-100">
+        <NuxtImg
+          :src="resolved_image_src"
+          :alt="article.title || 'Article image placeholder'"
           class="h-full w-full object-cover"
         />
       </div>
@@ -45,6 +45,7 @@
 
 <script setup lang="ts">
 import { format_display_date } from '~/utils/format-date'
+import { use_article_image } from '~/composables/use_article_image'
 
 const route = useRoute()
 const id = computed(() => String(route.params.id ?? ''))
@@ -67,6 +68,8 @@ const article = computed(() => {
   if (from_store) return from_store
   return articles.value.find((a) => a.id === id.value) ?? null
 })
+
+const { resolved_image_src } = use_article_image(article)
 
 const formatted_date = computed(() =>
   article.value ? format_display_date(article.value.publishedAt) : ''
