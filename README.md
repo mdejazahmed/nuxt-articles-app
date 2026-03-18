@@ -22,28 +22,28 @@ No environment variables are required; the API URL is set in `nuxt.config.ts` an
 - **`components/ui/`** – Pure UI (Button, Loader)
 - **`composables/`** – `useAPI.ts` (all HTTP to the API), `useArticles.ts` (SSR fetch + domain mapping)
 - **`models/api/`** – Raw API response types
-- **`models/domain/`** – UI-safe article model and `map_article_api_to_domain` mapper
+- **`models/domain/`** – UI-safe article model and `mapArticleApiToDomain` mapper
 - **`pages/`** – Index (list) and `articles/[id]` (detail)
 - **`stores/`** – Pinia `articlesStore` (articles list cache, favorites)
-- **`utils/`** – Helpers (e.g. `format_display_date`)
+- **`utils/`** – Helpers (e.g. `formatDisplayDate`)
 - **`types/`** – Shared types and `ApiResponse<T>`
 
 ## API & composables strategy
 
-- All API communication goes through **`composables/useAPI.ts`**. It exposes `get_articles()` which returns `Promise<ApiResponse<ArticlesResponseApi>>` with a 10s timeout and internal try/catch. No `$fetch` or `useFetch` of the API URL in pages or components.
-- **`composables/useArticles.ts`** uses `useAsyncData` with a stable key (`'articles'`) and calls `get_articles()`, then maps the response to domain `Article[]` via `map_article_api_to_domain`. It exposes `articles`, `pending`, `error`, and `refresh`. Pages use only this composable for data.
+- All API communication goes through **`composables/useAPI.ts`**. It exposes `getArticles()` which returns `Promise<ApiResponse<ArticlesResponseApi>>` with a 10s timeout and internal try/catch. No `$fetch` or `useFetch` of the API URL in pages or components.
+- **`composables/useArticles.ts`** uses `useAsyncData` with a stable key (`'articles'`) and calls `getArticles()`, then maps the response to domain `Article[]` via `mapArticleApiToDomain`. It exposes `articles`, `pending`, `error`, and `refresh`. Pages use only this composable for data.
 - SSR: the list page uses `useArticles()` so the first HTML includes the articles; the same key avoids a duplicate client request when the payload is already hydrated.
 
 ## Typing decisions
 
 - **Strict TypeScript**: no `any`; all functions have return types.
-- **Discriminated union**: `ApiResponse<T>` is `ApiResponseSuccess<T> | ApiResponseError` with a `status` discriminator; `is_api_success()` / `is_api_error()` type guards are used in composables.
+- **Discriminated union**: `ApiResponse<T>` is `ApiResponseSuccess<T> | ApiResponseError` with a `status` discriminator; `isApiSuccess()` / `isApiError()` type guards are used in composables.
 - **Raw vs domain**: API types in `models/api/` reflect the API exactly (nullable/optional fields). Domain types in `models/domain/` have required fields with fallbacks; the mapper normalizes `[Removed]`, null, and empty strings so the UI never sees undefined in required fields.
 
 ## Error-handling approach
 
 - **useAPI**: Catches all errors (network, timeout, non-2xx), returns `{ status: 'error', error: { message, code? } }` instead of throwing.
-- **useArticles**: Throws only when mapping (so `useAsyncData` can set `error`); the fetcher uses the API response and throws if `!is_api_success(response)` so Nuxt exposes the error to the UI.
+- **useArticles**: Throws only when mapping (so `useAsyncData` can set `error`); the fetcher uses the API response and throws if `!isApiSuccess(response)` so Nuxt exposes the error to the UI.
 - **UI**: List and detail pages show `<ErrorMessage>` when `error` is set, with a “Try again” that calls `refresh()`. `<Loader>` is shown while `pending`. Empty list shows `<EmptyState>`. Detail page shows “Article not found” when the id is not in the list.
 - **Global**: `error.vue` is used as a fallback when a fatal error occurs; it shows the message and a “Go home” button that clears the error and redirects to `/`.
 
@@ -58,7 +58,7 @@ No environment variables are required; the API URL is set in `nuxt.config.ts` an
 
 - **Skeleton loaders**: Replace the spinner on the list with skeleton cards to reduce layout shift.
 - **Pinia persistence**: Persist favorites to `localStorage` via a Pinia plugin.
-- **Unit tests**: Vitest + Vue Test Utils for `map_article_api_to_domain`, `get_articles` error paths, and one list/detail component.
+- **Unit tests**: Vitest + Vue Test Utils for `mapArticleApiToDomain`, `getArticles` error paths, and one list/detail component.
 - **E2E**: Playwright for list → detail → back and for error/retry flows.
 - **Deploy**: Vercel or Netlify with a one-command deploy and document the URL in the README.
 - **Offline detection**: Use `navigator.onLine` in a composable and show a banner when offline, with a prompt to refresh when back online.

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { computed } from 'vue'
-import { use_article_image } from '~/composables/use_article_image'
+import { useArticleImage } from '~/composables/useArticleImage'
 import { PLACEHOLDER_ARTICLE_IMAGE } from '~/utils/assets'
 import type { Article } from '~/models/domain'
 
@@ -25,33 +25,33 @@ function build_article(article_id: string, overrides: Partial<Article>): Article
   }
 }
 
-describe('use_article_image', () =>
+describe('useArticleImage', () =>
 {
   it('returns placeholder when article is null', () =>
   {
     const article_ref = computed(() => null as Article | null)
-    const { resolved_image_src } = use_article_image(article_ref)
+    const { resolvedImageSrc } = useArticleImage(article_ref)
 
-    expect(resolved_image_src.value).toBe(PLACEHOLDER_ARTICLE_IMAGE)
+    expect(resolvedImageSrc.value).toBe(PLACEHOLDER_ARTICLE_IMAGE)
   })
 
   it('returns placeholder when urlToImage is empty', () =>
   {
     const article = build_article('a1', { urlToImage: '' })
-    const { resolved_image_src } = use_article_image(article)
+    const { resolvedImageSrc } = useArticleImage(article)
 
-    expect(resolved_image_src.value).toBe(PLACEHOLDER_ARTICLE_IMAGE)
+    expect(resolvedImageSrc.value).toBe(PLACEHOLDER_ARTICLE_IMAGE)
   })
 
-  it('switches to placeholder after handle_image_error', () =>
+  it('switches to placeholder after handleImageError', () =>
   {
     const article = build_article('a2', { urlToImage: 'https://example.test/img.jpg' })
-    const { resolved_image_src, handle_image_error } = use_article_image(article)
+    const { resolvedImageSrc, handleImageError } = useArticleImage(article)
 
-    expect(resolved_image_src.value).toBe('https://example.test/img.jpg')
+    expect(resolvedImageSrc.value).toBe('https://example.test/img.jpg')
 
-    handle_image_error()
-    expect(resolved_image_src.value).toBe(PLACEHOLDER_ARTICLE_IMAGE)
+    handleImageError()
+    expect(resolvedImageSrc.value).toBe(PLACEHOLDER_ARTICLE_IMAGE)
   })
 })
 

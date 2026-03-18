@@ -18,11 +18,11 @@ export interface ApiResponseError {
 
 export type ApiResponse<T> = ApiResponseSuccess<T> | ApiResponseError
 
-export function is_api_error<T>(res: ApiResponse<T>): res is ApiResponseError {
+export function isApiError<T>(res: ApiResponse<T>): res is ApiResponseError {
   return res.status === 'error'
 }
 
-export function is_api_success<T>(res: ApiResponse<T>): res is ApiResponseSuccess<T> {
+export function isApiSuccess<T>(res: ApiResponse<T>): res is ApiResponseSuccess<T> {
   return res.status === 'success'
 }
  

@@ -1,8 +1,8 @@
 import { describe, expect, it, beforeEach, vi } from 'vitest'
 import type { ArticlesResponseApi } from '~/models/api/articles'
-import { get_articles } from '~/composables/useAPI'
+import { getArticles } from '~/composables/useAPI'
 
-describe('useAPI get_articles', () =>
+describe('useAPI getArticles', () =>
 {
   beforeEach(() =>
   {
@@ -34,7 +34,7 @@ describe('useAPI get_articles', () =>
     const fetch_mock = vi.fn(async () => fetch_payload)
     globalThis.$fetch = fetch_mock
 
-    const res = await get_articles()
+    const res = await getArticles()
 
     expect(fetch_mock).toHaveBeenCalledWith(api_base_url, { timeout: 10_000 })
     expect(res.status).toBe('success')
@@ -60,7 +60,7 @@ describe('useAPI get_articles', () =>
     })
     globalThis.$fetch = fetch_mock
 
-    const res = await get_articles()
+    const res = await getArticles()
 
     expect(fetch_mock).toHaveBeenCalledWith(api_base_url, { timeout: 10_000 })
     expect(res.status).toBe('error')

@@ -9,14 +9,14 @@
       </NuxtLink>
       <div class="flex items-center gap-3">
         <button
-          v-if="show_view_toggle"
+          v-if="showViewToggle"
           type="button"
           class="flex h-9 w-9 items-center justify-center rounded-full bg-slate-100/80 text-slate-900 hover:bg-slate-200/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900/20"
-          :aria-label="view_toggle_aria_label"
-          @click="handle_toggle_view_mode"
+          :aria-label="viewToggleAriaLabel"
+          @click="handleToggleViewMode"
         >
           <Icon
-            v-if="is_grid_view"
+            v-if="isGridView"
             name="mdi:view-grid-outline"
             class="h-5 w-5"
           />
@@ -27,7 +27,7 @@
           />
         </button>
         <button
-          v-if="show_search_toggle"
+          v-if="showSearchToggle"
           type="button"
           class="flex h-9 w-9 items-center justify-center rounded-full bg-slate-100/80 text-slate-900 hover:bg-slate-200/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900/20"
           aria-label="Search articles"
@@ -54,15 +54,15 @@
  * Variables: None.
  */
 interface Props {
-  show_view_toggle?: boolean
-  show_search_toggle?: boolean
-  view_mode?: 'grid' | 'list'
+  showViewToggle?: boolean
+  showSearchToggle?: boolean
+  viewMode?: 'grid' | 'list'
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  show_view_toggle: false,
-  show_search_toggle: false,
-  view_mode: 'grid',
+  showViewToggle: false,
+  showSearchToggle: false,
+  viewMode: 'grid',
 })
 
 const emit = defineEmits<{
@@ -70,13 +70,13 @@ const emit = defineEmits<{
   (event: 'toggle-search'): void
 }>()
 
-const is_grid_view = computed((): boolean => props.view_mode === 'grid')
+const isGridView = computed((): boolean => props.viewMode === 'grid')
 
-const view_toggle_aria_label = computed((): string =>
-  is_grid_view.value ? 'Switch to list view' : 'Switch to grid view',
+const viewToggleAriaLabel = computed((): string =>
+  isGridView.value ? 'Switch to list view' : 'Switch to grid view',
 )
 
-const handle_toggle_view_mode = (): void =>
+const handleToggleViewMode = (): void =>
 {
   emit('toggle-view')
 }

@@ -1,36 +1,36 @@
 <template>
-  <article :class="card_classes">
-    <NuxtLink :to="link_to" :class="link_classes">
-      <div :class="image_wrapper_classes">
+  <article :class="cardClasses">
+    <NuxtLink :to="linkTo" :class="linkClasses">
+      <div :class="imageWrapperClasses">
         <NuxtImg
-          :src="resolved_image_src"
+          :src="resolvedImageSrc"
           :alt="article.title || 'Article image placeholder'"
-          :class="image_classes"
+          :class="imageClasses"
           loading="lazy"
-          @error="handle_image_error"
+          @error="handleImageError"
         />
       </div>
-      <div :class="body_classes">
-        <h2 :class="title_classes">
+      <div :class="bodyClasses">
+        <h2 :class="titleClasses">
           {{ article.title }}
         </h2>
         <p
-          v-if="article.description && show_description"
-          :class="description_classes"
+          v-if="article.description && showDescription"
+          :class="descriptionClasses"
         >
           {{ article.description }}
         </p>
-        <div :class="meta_row_classes" class="flex align-center justify-between">
+        <div :class="metaRowClasses" class="flex align-center justify-between">
           <div class="flex items-center gap-2">
-            <span :class="meta_icon_wrapper_classes">
+            <span :class="metaIconWrapperClasses">
             <Icon name="mdi:clock-outline" class="h-3 w-3 text-slate-100" />
           </span>
           <span class="truncate">
-            {{ formatted_date }}
+            {{ formattedDate }}
           </span>
           </div>
           <div
-          v-if="show_cta"
+          v-if="showCta"
           class="flex justify-end"
         >
           <span
@@ -48,8 +48,8 @@
 
 <script setup lang="ts">
 import type { Article } from '~/models/domain'
-import { format_display_date } from '~/utils/format-date'
-import { use_article_image } from '~/composables/use_article_image'
+import { formatDisplayDate } from '~/utils/format-date'
+import { useArticleImage } from '~/composables/useArticleImage'
 
 /**
  * Module: ArticleCard
@@ -58,7 +58,7 @@ import { use_article_image } from '~/composables/use_article_image'
  * Modification History: Updated visual design to match mobile article card reference.
  * Summary: Displays a single article preview card with image, title, description, date, and (optionally) a styled Read More call-to-action.
  * Functions: None.
- * Variables accessed: article (prop), link_to, formatted_date, link_classes.
+ * Variables accessed: article (prop), linkTo, formattedDate, linkClasses.
  */
 interface Props {
   article: Article
@@ -70,72 +70,72 @@ const props = withDefaults(defineProps<Props>(), {
 })
 
 // #region derived values
-const link_to = computed((): string => `/articles/${props.article.id}`)
-const formatted_date = computed((): string => format_display_date(props.article.publishedAt))
-const { resolved_image_src, handle_image_error } = use_article_image(props.article)
+const linkTo = computed((): string => `/articles/${props.article.id}`)
+const formattedDate = computed((): string => formatDisplayDate(props.article.publishedAt))
+const { resolvedImageSrc, handleImageError } = useArticleImage(props.article)
 
-const is_list_variant = computed((): boolean => props.variant === 'list')
+const isListVariant = computed((): boolean => props.variant === 'list')
 
-const card_classes = computed(
+const cardClasses = computed(
   () =>
     'overflow-hidden rounded-2xl bg-[#233D46] text-white shadow-md ring-1 ring-slate-900/40 transition hover:shadow-lg',
 )
 
-const link_classes = computed(
+const linkClasses = computed(
   (): string =>
-    is_list_variant.value
+    isListVariant.value
       ? 'flex flex-row items-start gap-3'
       : 'flex flex-col',
 )
 
-const image_wrapper_classes = computed(
+const imageWrapperClasses = computed(
   () =>
-    is_list_variant.value
+    isListVariant.value
       ? 'w-28 sm:w-36 flex-shrink-0 overflow-hidden bg-slate-800'
       : 'aspect-video w-full overflow-hidden bg-slate-800',
 )
 
-const body_classes = computed(
+const bodyClasses = computed(
   () =>
-    is_list_variant.value
+    isListVariant.value
       ? 'flex flex-1 flex-col p-3 min-w-0'
       : 'flex flex-1 flex-col p-4',
 )
 
-const title_classes = computed(
+const titleClasses = computed(
   () =>
-    is_list_variant.value
+    isListVariant.value
       ? 'text-sm font-semibold leading-snug text-white line-clamp-2'
       : 'text-base font-semibold leading-snug text-white line-clamp-2',
 )
 
-const description_classes = computed(
+const descriptionClasses = computed(
   () =>
-    is_list_variant.value
+    isListVariant.value
       ? 'mt-1 text-xs text-slate-100/80 line-clamp-2'
       : 'mt-2 text-sm text-slate-100/80 line-clamp-2',
 )
 
-const meta_row_classes = computed(
+const metaRowClasses = computed(
   () =>
-    is_list_variant.value
+    isListVariant.value
       ? 'mt-auto flex items-center text-[11px] text-slate-100/70'
       : 'mt-3 flex items-center text-xs text-slate-100/70',
 )
 
-const meta_icon_wrapper_classes = computed(
+const metaIconWrapperClasses = computed(
   () =>
     'mr-2 flex h-4 w-4 items-center justify-center rounded-full bg-slate-900/40',
 )
 
-const image_classes = computed(
+const imageClasses = computed(
   (): string =>
-    is_list_variant.value ? 'w-full object-cover' : 'h-full w-full object-cover',
+    isListVariant.value ? 'w-full object-cover' : 'h-full w-full object-cover',
 )
 
-const show_description = computed((): boolean => true)
+const showDescription = computed((): boolean => true)
 
-const show_cta = computed((): boolean => !is_list_variant.value)
+const showCta = computed((): boolean => !isListVariant.value)
 
 // #endregion
 </script>

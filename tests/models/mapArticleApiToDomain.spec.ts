@@ -1,12 +1,12 @@
 import { describe, expect, it } from 'vitest'
 import type { ArticleApi } from '~/models/api/articles'
-import { map_article_api_to_domain } from '~/models/domain'
+import { mapArticleApiToDomain } from '~/models/domain'
 
-describe('map_article_api_to_domain', () =>
+describe('mapArticleApiToDomain', () =>
 {
   it('normalizes [Removed] placeholders and trims strings', () =>
   {
-    const raw_article_api: ArticleApi = {
+    const rawArticleApi: ArticleApi = {
       title: '[Removed]',
       description: '[Removed]',
       author: '[Removed]',
@@ -17,7 +17,7 @@ describe('map_article_api_to_domain', () =>
       content: '[Removed]',
     }
 
-    const article = map_article_api_to_domain(raw_article_api, 2)
+    const article = mapArticleApiToDomain(rawArticleApi, 2)
 
     expect(article.id).toBe('article-2')
     expect(article.title).toBe('Untitled')
@@ -32,7 +32,7 @@ describe('map_article_api_to_domain', () =>
 
   it('falls back for null/empty fields', () =>
   {
-    const raw_article_api: ArticleApi = {
+    const rawArticleApi: ArticleApi = {
       title: null,
       description: undefined,
       author: undefined,
@@ -43,7 +43,7 @@ describe('map_article_api_to_domain', () =>
       content: undefined,
     }
 
-    const article = map_article_api_to_domain(raw_article_api, 0)
+    const article = mapArticleApiToDomain(rawArticleApi, 0)
 
     expect(article.id).toBe('article-0')
     expect(article.title).toBe('Untitled')

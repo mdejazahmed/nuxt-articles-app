@@ -4,7 +4,7 @@
       Latest articles
     </h1>
     <div
-      v-if="is_search_open"
+      v-if="isSearchOpen"
       class="mb-4"
     >
       <label
@@ -15,8 +15,8 @@
       </label>
       <input
         id="article-search"
-        ref="search_input_ref"
-        v-model="search_input"
+        ref="searchInputRef"
+        v-model="searchInput"
         type="search"
         class="block w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500"
         placeholder="Search by title, description, author..."
@@ -25,7 +25,7 @@
     </div>
     <ul
       v-if="pending"
-      :class="list_classes_grid"
+      :class="listClassesGrid"
     >
       <li
         v-for="i in 6"
@@ -41,21 +41,21 @@
       @retry="refresh()"
     />
     <EmptyState
-      v-else-if="display_list.length === 0"
+      v-else-if="displayList.length === 0"
       title="No articles"
-      :description="empty_state_description"
+      :description="emptyStateDescription"
     />
     <ul
       v-else
-      :class="is_grid_view ? list_classes_grid : list_classes_list"
+      :class="isGridView ? listClassesGrid : listClassesList"
     >
       <li
-        v-for="article in display_list"
+        v-for="article in displayList"
         :key="article.id"
       >
         <ArticleCard
           :article="article"
-          :variant="is_grid_view ? 'grid' : 'list'"
+          :variant="isGridView ? 'grid' : 'list'"
         />
       </li>
     </ul>
@@ -70,63 +70,63 @@
  * Modification History: Added header view toggle, search input, and grid/list layouts with live filtering.
  * Summary: Article list page. Fetches via useArticles, syncs to store, and renders filterable grid or list views.
  * Functions: None.
- * Variables: store, is_search_open, search_input, display_list, is_grid_view, list_classes_grid, list_classes_list, empty_state_description.
+ * Variables: store, isSearchOpen, searchInput, displayList, isGridView, listClassesGrid, listClassesList, emptyStateDescription.
  */
 const { articles, pending, error, refresh } = useArticles()
-const store = use_articles_store()
+const store = useArticlesStore()
 
 // #region variables
-const search_open_state = useState<boolean>('articles-search-open', () => false)
-const search_input_ref = ref<HTMLInputElement | null>(null)
-const search_input = ref(store.search_query)
+const searchOpenState = useState<boolean>('articles-search-open', () => false)
+const searchInputRef = ref<HTMLInputElement | null>(null)
+const searchInput = ref(store.searchQuery)
 
-const list_classes_grid = computed(
+const listClassesGrid = computed(
   () =>
     'grid gap-4 sm:grid-cols-2 lg:grid-cols-3',
 )
 
-const list_classes_list = computed(
+const listClassesList = computed(
   () =>
     'flex flex-col gap-3',
 )
 
-const is_grid_view = computed(() => store.view_mode === 'grid')
+const isGridView = computed(() => store.viewMode === 'grid')
 
-const display_list = computed(() => store.filtered_articles)
+const displayList = computed(() => store.filteredArticles)
 
-const empty_state_description = computed(() =>
-  store.search_query
+const emptyStateDescription = computed(() =>
+  store.searchQuery
     ? 'No articles match your search. Try a different keyword.'
     : 'There are no articles to show right now.',
 )
 
-const is_search_open = computed(() => search_open_state.value)
+const isSearchOpen = computed(() => searchOpenState.value)
 // #endregion
 
 watch(
   articles,
   (list) => {
     if (list.length > 0) {
-      store.set_articles(list)
+      store.setArticles(list)
     }
   },
   { immediate: true },
 )
 
 watch(
-  search_input,
+  searchInput,
   (value) => {
-    store.set_search_query(value)
+    store.setSearchQuery(value)
   },
 )
 
 watch(
-  is_search_open,
+  isSearchOpen,
   (open) => {
     if (open) {
       nextTick(() => {
-        if (search_input_ref.value) {
-          search_input_ref.value.focus()
+        if (searchInputRef.value) {
+          searchInputRef.value.focus()
         }
       })
     }

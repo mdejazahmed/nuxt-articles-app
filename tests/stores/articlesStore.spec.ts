@@ -1,6 +1,6 @@
 import { describe, expect, it, beforeEach } from 'vitest'
 import { createPinia, setActivePinia } from 'pinia'
-import { use_articles_store } from '~/stores/articlesStore'
+import { useArticlesStore } from '~/stores/articlesStore'
 import type { Article } from '~/models/domain'
 
 function build_article(article_id: string, overrides: Partial<Article>): Article
@@ -26,12 +26,12 @@ function build_article(article_id: string, overrides: Partial<Article>): Article
 
 describe('articlesStore', () =>
 {
-  let store!: ReturnType<typeof use_articles_store>
+  let store!: ReturnType<typeof useArticlesStore>
 
   beforeEach(() =>
   {
     setActivePinia(createPinia())
-    store = use_articles_store()
+    store = useArticlesStore()
   })
 
   it('filters articles across multiple fields (case-insensitive)', () =>
@@ -50,10 +50,10 @@ describe('articlesStore', () =>
       sourceName: 'Blue Daily',
     })
 
-    store.set_articles([article_1, article_2])
+    store.setArticles([article_1, article_2])
 
-    store.set_search_query('teal')
-    const filtered = store.filtered_articles
+    store.setSearchQuery('teal')
+    const filtered = store.filteredArticles
 
     expect(filtered).toHaveLength(1)
     expect(filtered[0].id).toBe('a1')
@@ -63,35 +63,35 @@ describe('articlesStore', () =>
   {
     const target_id = 'article-1'
 
-    store.toggle_like(target_id)
+    store.toggleLike(target_id)
     expect(store.favorites).toContain(target_id)
     expect(store.dislikes).not.toContain(target_id)
 
-    store.toggle_dislike(target_id)
+    store.toggleDislike(target_id)
     expect(store.dislikes).toContain(target_id)
     expect(store.favorites).not.toContain(target_id)
 
-    store.toggle_like(target_id)
+    store.toggleLike(target_id)
     expect(store.favorites).toContain(target_id)
     expect(store.dislikes).not.toContain(target_id)
   })
 
-  it('toggle_like removes the favorite when called twice', () =>
+  it('toggleLike removes the favorite when called twice', () =>
   {
     const target_id = 'article-2'
 
-    store.toggle_like(target_id)
+    store.toggleLike(target_id)
     expect(store.favorites).toContain(target_id)
 
-    store.toggle_like(target_id)
+    store.toggleLike(target_id)
     expect(store.favorites).not.toContain(target_id)
   })
 
-  it('toggle_favorite is a backwards-compatible alias', () =>
+  it('toggleFavorite is a backwards-compatible alias', () =>
   {
     const target_id = 'article-3'
 
-    store.toggle_favorite(target_id)
+    store.toggleFavorite(target_id)
     expect(store.favorites).toContain(target_id)
   })
 })

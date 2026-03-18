@@ -13,7 +13,7 @@ const DEFAULT_TIMEOUT_MS = 10_000
  * Fetches the articles list from the mock API.
  * Returns a typed ApiResponse; never throws.
  */
-export async function get_articles(): Promise<ApiResponse<ArticlesResponseApi>> {
+export async function getArticles(): Promise<ApiResponse<ArticlesResponseApi>> {
   const config = useRuntimeConfig()
   const url = config.public.apiBaseUrl as string
 

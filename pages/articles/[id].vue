@@ -18,13 +18,13 @@
           <button
             type="button"
             class="flex h-10 w-10 items-center justify-center rounded-full transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
-            :class="reaction_button_classes"
+            :class="reactionButtonClasses"
             aria-label="Toggle like/dislike"
-            :aria-pressed="is_article_liked || is_article_disliked"
-            @click="handle_toggle_reaction"
+            :aria-pressed="isArticleLiked || isArticleDisliked"
+            @click="handleToggleReaction"
           >
             <Icon
-              :name="reaction_icon_name"
+              :name="reactionIconName"
               class="h-6 w-6"
             />
           </button>
@@ -42,7 +42,7 @@
         </h1>
         <div class="mt-3 flex items-center gap-2 text-sm text-white/70">
           <Icon name="mdi:clock-outline" class="h-4 w-4" />
-          <span>{{ formatted_date }}</span>
+          <span>{{ formattedDate }}</span>
         </div>
       </div>
     </section>
@@ -53,10 +53,10 @@
       >
         <div class="aspect-video w-full overflow-hidden">
           <NuxtImg
-            :src="resolved_image_src"
+            :src="resolvedImageSrc"
             :alt="article?.title || 'Article image placeholder'"
             class="h-full w-full object-cover"
-            @error="handle_image_error"
+            @error="handleImageError"
           />
         </div>
       </div>
@@ -121,35 +121,35 @@
  * Modification History: Updated detail layout to match dark article design with back and like/dislike actions.
  * Summary: Renders a single article detail with a top bar (back arrow, like, dislike).
  * Functions:
- * - handle_toggle_reaction: alternates like/dislike for the current article.
- * Variables accessed: route, id, articles, pending, error, refresh, store, article, resolved_image_src, handle_image_error.
+ * - handleToggleReaction: alternates like/dislike for the current article.
+ * Variables accessed: route, id, articles, pending, error, refresh, store, article, resolvedImageSrc, handleImageError.
  */
 definePageMeta({ layout: false })
 
-import { format_display_date } from '~/utils/format-date'
-import { use_article_image } from '~/composables/use_article_image'
+import { formatDisplayDate } from '~/utils/format-date'
+import { useArticleImage } from '~/composables/useArticleImage'
 
 // #region variables
 const route = useRoute()
 const id = computed(() => String(route.params.id ?? ''))
-const article_id = computed((): string => id.value)
+const articleId = computed((): string => id.value)
 
 const { articles, pending, error, refresh } = useArticles()
-const store = use_articles_store()
+const store = useArticlesStore()
 // #endregion
 
 // #region store-backed state
-const is_article_liked = computed((): boolean => store.is_liked(article_id.value))
-const is_article_disliked = computed((): boolean => store.is_disliked(article_id.value))
+const isArticleLiked = computed((): boolean => store.isLiked(articleId.value))
+const isArticleDisliked = computed((): boolean => store.isDisliked(articleId.value))
 
-const reaction_icon_name = computed((): string => {
-  if (is_article_liked.value) return 'mdi:heart-plus'
-  if (is_article_disliked.value) return 'mdi:heart-minus'
+const reactionIconName = computed((): string => {
+  if (isArticleLiked.value) return 'mdi:heart-plus'
+  if (isArticleDisliked.value) return 'mdi:heart-minus'
   return 'mdi:heart-plus-outline'
 })
 
-const reaction_button_classes = computed((): string =>
-  is_article_liked.value || is_article_disliked.value
+const reactionButtonClasses = computed((): string =>
+  isArticleLiked.value || isArticleDisliked.value
     ? 'bg-[#195A94] text-white'
     : 'bg-slate-800/40 text-white/80 hover:bg-slate-800/70',
 )
@@ -163,37 +163,37 @@ watch(
   articles,
   (list) => {
     if (list.length > 0) {
-      store.set_articles(list)
+      store.setArticles(list)
     }
   },
   { immediate: true }
 )
 
 const article = computed(() => {
-  const from_store = store.article_by_id(id.value)
-  if (from_store) return from_store
+  const fromStore = store.articleById(id.value)
+  if (fromStore) return fromStore
   return articles.value.find((a) => a.id === id.value) ?? null
 })
 
-const { resolved_image_src, handle_image_error } = use_article_image(article)
+const { resolvedImageSrc, handleImageError } = useArticleImage(article)
 
-const formatted_date = computed(() =>
-  article.value ? format_display_date(article.value.publishedAt) : ''
+const formattedDate = computed(() =>
+  article.value ? formatDisplayDate(article.value.publishedAt) : ''
 )
 // #endregion
 
 // #region actions
-const handle_toggle_reaction = (): void => {
+const handleToggleReaction = (): void => {
   if (!article.value) return
 
   // One button "interchanges" like/dislike by alternating states:
   // neutral -> like, like -> dislike, dislike -> like.
-  if (is_article_liked.value) {
-    store.toggle_dislike(article_id.value)
+  if (isArticleLiked.value) {
+    store.toggleDislike(articleId.value)
     return
   }
 
-  store.toggle_like(article_id.value)
+  store.toggleLike(articleId.value)
 }
 // #endregion
 </script>

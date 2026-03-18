@@ -5,9 +5,9 @@
  */
 
 import type { Article } from '~/models/domain'
-import { map_article_api_to_domain } from '~/models/domain'
-import { is_api_success } from '~/types'
-import { get_articles } from '~/composables/useAPI'
+import { mapArticleApiToDomain } from '~/models/domain'
+import { isApiSuccess } from '~/types'
+import { getArticles } from '~/composables/useAPI'
 
 const KEY_ARTICLES = 'articles'
 
@@ -19,15 +19,15 @@ export function useArticles() {
   const { data, pending, error, refresh } = useAsyncData(
     KEY_ARTICLES, 
     async (): Promise<Article[]> => {
-      const response = await get_articles()
-      if (!is_api_success(response)) {
+      const response = await getArticles()
+      if (!isApiSuccess(response)) {
         throw new Error(response.error.message)
       }
-      const raw_list = response.data.articles
-      if (!Array.isArray(raw_list)) {
+      const rawList = response.data.articles
+      if (!Array.isArray(rawList)) {
         return []
       }
-      return raw_list.map((raw, index) => map_article_api_to_domain(raw, index))
+      return rawList.map((raw, index) => mapArticleApiToDomain(raw, index))
     },
     {
       server: true,
@@ -36,7 +36,7 @@ export function useArticles() {
   )
 
   const articles = computed(() => data.value ?? [])
-  const error_message = computed(() => {
+  const errorMessage = computed(() => {
     if (!error.value) return null
     return error.value.message ?? 'Something went wrong'
   })
@@ -44,7 +44,7 @@ export function useArticles() {
   return {
     articles,
     pending,
-    error: error_message,
+    error: errorMessage,
     refresh,
   }
 }

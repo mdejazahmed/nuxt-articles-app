@@ -1,11 +1,11 @@
 <template>
   <div class="min-h-screen bg-slate-100">
     <AppHeader
-      :show_view_toggle="is_articles_index"
-      :show_search_toggle="is_articles_index"
-      :view_mode="articles_store.view_mode"
-      @toggle-view="handle_toggle_view"
-      @toggle-search="handle_toggle_search"
+      :showViewToggle="isArticlesIndex"
+      :showSearchToggle="isArticlesIndex"
+      :viewMode="articlesStore.viewMode"
+      @toggle-view="handleToggleView"
+      @toggle-search="handleToggleSearch"
     />
     <main class="mx-auto max-w-4xl px-4 py-6">
       <slot />
@@ -21,21 +21,21 @@
  */
 
 const route = useRoute()
-const articles_store = use_articles_store()
+const articlesStore = useArticlesStore()
 
-const is_articles_index = computed(() => route.name === 'index')
+const isArticlesIndex = computed(() => route.name === 'index')
 
-const search_open_state = useState<boolean>('articles-search-open', () => false)
+const searchOpenState = useState<boolean>('articles-search-open', () => false)
 
-const handle_toggle_view = (): void =>
+const handleToggleView = (): void =>
 {
-  const next_mode = articles_store.view_mode === 'grid' ? 'list' : 'grid'
-  articles_store.set_view_mode(next_mode)
+  const nextMode = articlesStore.viewMode === 'grid' ? 'list' : 'grid'
+  articlesStore.setViewMode(nextMode)
 }
 
-const handle_toggle_search = (): void =>
+const handleToggleSearch = (): void =>
 {
-  search_open_state.value = !search_open_state.value
+  searchOpenState.value = !searchOpenState.value
 }
 </script>
  

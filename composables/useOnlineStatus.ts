@@ -8,17 +8,17 @@
  * - Tracks browser online/offline state and provides a retry action that refreshes Nuxt data
  *   once connectivity is back.
  * Functions:
- * - use_online_status(): returns { is_online, retry }
+ * - useOnlineStatus(): returns { isOnline, retry }
  * Variables accessed:
  * - navigator.onLine, window online/offline events
  */
 
 interface UseOnlineStatusResult {
-  is_online: Readonly<Ref<boolean>>
+  isOnline: Readonly<Ref<boolean>>
   retry: () => Promise<void>
 }
 
-function read_navigator_online(): boolean {
+function readNavigatorOnline(): boolean {
   if (!import.meta.client) {
     return true
   }
@@ -30,17 +30,17 @@ function read_navigator_online(): boolean {
   return navigator.onLine
 }
 
-export function use_online_status(): UseOnlineStatusResult {
-  const is_online = ref<boolean>(read_navigator_online())
+export function useOnlineStatus(): UseOnlineStatusResult {
+  const isOnline = ref<boolean>(readNavigatorOnline())
 
-  function sync_status_from_browser(): void {
-    is_online.value = read_navigator_online()
+  function syncStatusFromBrowser(): void {
+    isOnline.value = readNavigatorOnline()
   }
 
   async function retry(): Promise<void> {
-    sync_status_from_browser()
+    syncStatusFromBrowser()
 
-    if (!is_online.value) {
+    if (!isOnline.value) {
       return
     }
 
@@ -48,10 +48,10 @@ export function use_online_status(): UseOnlineStatusResult {
   }
 
   onMounted(() => {
-    sync_status_from_browser()
+    syncStatusFromBrowser()
 
-    window.addEventListener('online', sync_status_from_browser)
-    window.addEventListener('offline', sync_status_from_browser)
+    window.addEventListener('online', syncStatusFromBrowser)
+    window.addEventListener('offline', syncStatusFromBrowser)
   })
 
   onBeforeUnmount(() => {
@@ -59,12 +59,12 @@ export function use_online_status(): UseOnlineStatusResult {
       return
     }
 
-    window.removeEventListener('online', sync_status_from_browser)
-    window.removeEventListener('offline', sync_status_from_browser)
+    window.removeEventListener('online', syncStatusFromBrowser)
+    window.removeEventListener('offline', syncStatusFromBrowser)
   })
 
   return {
-    is_online: readonly(is_online),
+    isOnline: readonly(isOnline),
     retry,
   }
 }

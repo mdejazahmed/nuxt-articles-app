@@ -6,104 +6,104 @@
 import { defineStore } from 'pinia'
 import type { Article } from '~/models/domain'
 
-export const use_articles_store = defineStore('articles', {
+export const useArticlesStore = defineStore('articles', {
   state: () => ({
     articles: [] as Article[],
     favorites: [] as string[],
     dislikes: [] as string[],
-    view_mode: 'grid' as 'grid' | 'list',
-    search_query: '',
+    viewMode: 'grid' as 'grid' | 'list',
+    searchQuery: '',
   }),
 
   getters: {
-    favorite_count(): number {
+    favoriteCount(): number {
       return this.favorites.length
     },
 
-    is_liked(): (id: string) => boolean {
+    isLiked(): (id: string) => boolean {
       return (id: string) => this.favorites.includes(id)
     },
 
-    is_disliked(): (id: string) => boolean {
+    isDisliked(): (id: string) => boolean {
       return (id: string) => this.dislikes.includes(id)
     },
 
-    // Backwards-compatible name used by any older pages/components.
-    is_favorite(): (id: string) => boolean {
-      return (id: string) => this.is_liked(id)
+    // Compatibility alias.
+    isFavorite(): (id: string) => boolean {
+      return (id: string) => this.isLiked(id)
     },
 
-    article_by_id(): (id: string) => Article | undefined {
+    articleById(): (id: string) => Article | undefined {
       return (id: string) => this.articles.find((a) => a.id === id)
     },
 
-    filtered_articles(): Article[] {
-      if (!this.search_query) {
+    filteredArticles(): Article[] {
+      if (!this.searchQuery) {
         return this.articles
       }
 
-      const needle = this.search_query.toLowerCase()
+      const needle = this.searchQuery.toLowerCase()
 
       return this.articles.filter((item) => {
         const title = item.title?.toLowerCase() ?? ''
         const description = item.description?.toLowerCase() ?? ''
         const author = item.author?.toLowerCase() ?? ''
-        const source_name = item.sourceName?.toLowerCase() ?? ''
+        const sourceName = item.sourceName?.toLowerCase() ?? ''
 
         return (
           title.includes(needle) ||
           description.includes(needle) ||
           author.includes(needle) ||
-          source_name.includes(needle)
+          sourceName.includes(needle)
         )
       })
     },
   },
 
   actions: {
-    set_articles(items: Article[]): void {
+    setArticles(items: Article[]): void {
       this.articles = items
     },
 
-    toggle_like(id: string): void {
+    toggleLike(id: string): void {
       const idx = this.favorites.indexOf(id)
       if (idx === -1) {
         this.favorites.push(id)
         // Dislike and like are mutually exclusive (dislike cancels like).
-        const dislike_idx = this.dislikes.indexOf(id)
-        if (dislike_idx !== -1) {
-          this.dislikes.splice(dislike_idx, 1)
+        const dislikeIdx = this.dislikes.indexOf(id)
+        if (dislikeIdx !== -1) {
+          this.dislikes.splice(dislikeIdx, 1)
         }
       } else {
         this.favorites.splice(idx, 1)
       }
     },
 
-    toggle_dislike(id: string): void {
+    toggleDislike(id: string): void {
       const idx = this.dislikes.indexOf(id)
       if (idx === -1) {
         this.dislikes.push(id)
         // Dislike and like are mutually exclusive (dislike cancels like).
-        const like_idx = this.favorites.indexOf(id)
-        if (like_idx !== -1) {
-          this.favorites.splice(like_idx, 1)
+        const likeIdx = this.favorites.indexOf(id)
+        if (likeIdx !== -1) {
+          this.favorites.splice(likeIdx, 1)
         }
       } else {
         this.dislikes.splice(idx, 1)
       }
     },
 
-    toggle_favorite(id: string): void {
-      // Keep the older store API name but route to the new like behavior.
-      this.toggle_like(id)
+    toggleFavorite(id: string): void {
+      // Kept as a friendly alias; favorites map to likes.
+      this.toggleLike(id)
     },
 
-    set_view_mode(mode: 'grid' | 'list'): void {
-      this.view_mode = mode
+    setViewMode(mode: 'grid' | 'list'): void {
+      this.viewMode = mode
     },
 
-    set_search_query(query: string): void {
-      this.search_query = query
+    setSearchQuery(query: string): void {
+      this.searchQuery = query
     },
   },
 })
