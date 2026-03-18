@@ -5,7 +5,7 @@
         <NuxtImg
           :src="resolved_image_src"
           :alt="article.title || 'Article image placeholder'"
-          class="h-full w-full object-cover"
+          :class="image_classes"
           loading="lazy"
           @error="handle_image_error"
         />
@@ -20,17 +20,18 @@
         >
           {{ article.description }}
         </p>
-        <div :class="meta_row_classes">
-          <span :class="meta_icon_wrapper_classes">
+        <div :class="meta_row_classes" class="flex align-center justify-between">
+          <div class="flex items-center gap-2">
+            <span :class="meta_icon_wrapper_classes">
             <Icon name="mdi:clock-outline" class="h-3 w-3 text-slate-100" />
           </span>
           <span class="truncate">
             {{ formatted_date }}
           </span>
-        </div>
-        <div
+          </div>
+          <div
           v-if="show_cta"
-          class="mt-4 flex justify-end"
+          class="flex justify-end"
         >
           <span
             class="inline-flex items-center gap-2 rounded-full bg-[#195A94] px-4 py-2 text-xs font-semibold uppercase tracking-wide text-white shadow-sm"
@@ -38,6 +39,7 @@
             Read More
             <Icon name="mdi:arrow-right" class="h-4 w-4 text-white" />
           </span>
+        </div>
         </div>
       </div>
     </NuxtLink>
@@ -82,7 +84,7 @@ const card_classes = computed(
 const link_classes = computed(
   (): string =>
     is_list_variant.value
-      ? 'flex min-h-[140px] sm:min-h-[160px] flex-row items-stretch gap-3'
+      ? 'flex flex-row items-start gap-3'
       : 'flex flex-col',
 )
 
@@ -124,6 +126,11 @@ const meta_row_classes = computed(
 const meta_icon_wrapper_classes = computed(
   () =>
     'mr-2 flex h-4 w-4 items-center justify-center rounded-full bg-slate-900/40',
+)
+
+const image_classes = computed(
+  (): string =>
+    is_list_variant.value ? 'w-full object-cover' : 'h-full w-full object-cover',
 )
 
 const show_description = computed((): boolean => true)
