@@ -10,6 +10,7 @@ export const use_articles_store = defineStore('articles', {
   state: () => ({
     articles: [] as Article[],
     favorites: [] as string[],
+    dislikes: [] as string[],
     view_mode: 'grid' as 'grid' | 'list',
     search_query: '',
   }),
@@ -19,8 +20,17 @@ export const use_articles_store = defineStore('articles', {
       return this.favorites.length
     },
 
-    is_favorite(): (id: string) => boolean {
+    is_liked(): (id: string) => boolean {
       return (id: string) => this.favorites.includes(id)
+    },
+
+    is_disliked(): (id: string) => boolean {
+      return (id: string) => this.dislikes.includes(id)
+    },
+
+    // Backwards-compatible name used by any older pages/components.
+    is_favorite(): (id: string) => boolean {
+      return (id: string) => this.is_liked(id)
     },
 
     article_by_id(): (id: string) => Article | undefined {
@@ -55,13 +65,37 @@ export const use_articles_store = defineStore('articles', {
       this.articles = items
     },
 
-    toggle_favorite(id: string): void {
+    toggle_like(id: string): void {
       const idx = this.favorites.indexOf(id)
       if (idx === -1) {
         this.favorites.push(id)
+        // Dislike and like are mutually exclusive (dislike cancels like).
+        const dislike_idx = this.dislikes.indexOf(id)
+        if (dislike_idx !== -1) {
+          this.dislikes.splice(dislike_idx, 1)
+        }
       } else {
         this.favorites.splice(idx, 1)
       }
+    },
+
+    toggle_dislike(id: string): void {
+      const idx = this.dislikes.indexOf(id)
+      if (idx === -1) {
+        this.dislikes.push(id)
+        // Dislike and like are mutually exclusive (dislike cancels like).
+        const like_idx = this.favorites.indexOf(id)
+        if (like_idx !== -1) {
+          this.favorites.splice(like_idx, 1)
+        }
+      } else {
+        this.dislikes.splice(idx, 1)
+      }
+    },
+
+    toggle_favorite(id: string): void {
+      // Keep the older store API name but route to the new like behavior.
+      this.toggle_like(id)
     },
 
     set_view_mode(mode: 'grid' | 'list'): void {
