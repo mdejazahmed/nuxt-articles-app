@@ -1,6 +1,6 @@
 <template>
   <article :class="card_classes">
-    <NuxtLink :to="link_to" class="flex h-full flex-col">
+    <NuxtLink :to="link_to" :class="link_classes">
       <div :class="image_wrapper_classes">
         <NuxtImg
           :src="resolved_image_src"
@@ -54,9 +54,9 @@ import { use_article_image } from '~/composables/use_article_image'
  * Creator: user
  * Creation Date: 2026-03-18
  * Modification History: Updated visual design to match mobile article card reference.
- * Summary: Displays a single article preview card with image, title, description, date, and a styled Read More call-to-action.
+ * Summary: Displays a single article preview card with image, title, description, date, and (optionally) a styled Read More call-to-action.
  * Functions: None.
- * Variables: article (prop), link_to, formatted_date.
+ * Variables accessed: article (prop), link_to, formatted_date, link_classes.
  */
 interface Props {
   article: Article
@@ -67,6 +67,7 @@ const props = withDefaults(defineProps<Props>(), {
   variant: 'grid',
 })
 
+// #region derived values
 const link_to = computed((): string => `/articles/${props.article.id}`)
 const formatted_date = computed((): string => format_display_date(props.article.publishedAt))
 const { resolved_image_src, handle_image_error } = use_article_image(props.article)
@@ -78,17 +79,24 @@ const card_classes = computed(
     'overflow-hidden rounded-2xl bg-[#233D46] text-white shadow-md ring-1 ring-slate-900/40 transition hover:shadow-lg',
 )
 
+const link_classes = computed(
+  (): string =>
+    is_list_variant.value
+      ? 'flex min-h-[140px] sm:min-h-[160px] flex-row items-stretch gap-3'
+      : 'flex flex-col',
+)
+
 const image_wrapper_classes = computed(
   () =>
     is_list_variant.value
-      ? 'aspect-[4/3] w-full overflow-hidden bg-slate-800'
+      ? 'w-28 sm:w-36 flex-shrink-0 overflow-hidden bg-slate-800'
       : 'aspect-video w-full overflow-hidden bg-slate-800',
 )
 
 const body_classes = computed(
   () =>
     is_list_variant.value
-      ? 'flex flex-1 flex-col p-3'
+      ? 'flex flex-1 flex-col p-3 min-w-0'
       : 'flex flex-1 flex-col p-4',
 )
 
@@ -109,7 +117,7 @@ const description_classes = computed(
 const meta_row_classes = computed(
   () =>
     is_list_variant.value
-      ? 'mt-2 flex items-center text-[11px] text-slate-100/70'
+      ? 'mt-auto flex items-center text-[11px] text-slate-100/70'
       : 'mt-3 flex items-center text-xs text-slate-100/70',
 )
 
@@ -121,4 +129,6 @@ const meta_icon_wrapper_classes = computed(
 const show_description = computed((): boolean => true)
 
 const show_cta = computed((): boolean => !is_list_variant.value)
+
+// #endregion
 </script>
