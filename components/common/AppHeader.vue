@@ -1,6 +1,6 @@
 <template>
-  <header class="border-b border-slate-800 bg-[#233D46] text-white">
-    <div class="mx-auto flex h-14 max-w-md items-center justify-between px-4">
+  <header class="sticky top-0 z-50 border-b border-slate-200 bg-white text-slate-900">
+    <div class="flex h-14 items-center justify-between px-4">
       <NuxtLink
         to="/"
         class="text-lg font-semibold tracking-tight hover:opacity-90"
@@ -11,7 +11,7 @@
         <button
           v-if="show_view_toggle"
           type="button"
-          class="flex h-9 w-9 items-center justify-center rounded-full bg-slate-800/60 text-white hover:bg-slate-700/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
+          class="flex h-9 w-9 items-center justify-center rounded-full bg-slate-100/80 text-slate-900 hover:bg-slate-200/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900/20"
           :aria-label="view_toggle_aria_label"
           @click="handle_toggle_view_mode"
         >
@@ -29,7 +29,7 @@
         <button
           v-if="show_search_toggle"
           type="button"
-          class="flex h-9 w-9 items-center justify-center rounded-full bg-slate-800/60 text-white hover:bg-slate-700/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
+          class="flex h-9 w-9 items-center justify-center rounded-full bg-slate-100/80 text-slate-900 hover:bg-slate-200/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-900/20"
           aria-label="Search articles"
           @click="$emit('toggle-search')"
         >

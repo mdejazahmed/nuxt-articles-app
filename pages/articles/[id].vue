@@ -3,7 +3,7 @@
     <section
       class="bg-[#233D46] text-white min-h-[45vh] pb-24"
     >
-      <div class="mx-auto flex h-14 max-w-4xl items-center justify-between px-4">
+      <header class="bg-[#233D46] sticky top-0 z-50 mx-auto flex h-14 max-w-4xl items-center justify-between px-4">
         <NuxtLink
           to="/"
           class="flex h-10 w-10 items-center justify-center rounded-full bg-slate-800/40 text-white transition hover:bg-slate-800/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
@@ -29,7 +29,7 @@
             />
           </button>
         </div>
-      </div>
+      </header>
 
       <div
         v-if="article"
