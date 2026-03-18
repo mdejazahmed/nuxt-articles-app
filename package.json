@@ -6,7 +6,9 @@
     "build": "nuxt build",
     "dev": "nuxt dev --host",
     "generate": "nuxt generate",
-    "preview": "nuxt preview"
+    "preview": "nuxt preview",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@nuxt/icon": "^1.15.0",
@@ -17,6 +19,7 @@
   },
   "devDependencies": {
     "@nuxtjs/tailwindcss": "^6.12.0",
+    "vitest": "^2.1.0",
     "typescript": "~5.7.2"
   }
 }
