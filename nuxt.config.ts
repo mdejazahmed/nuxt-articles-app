@@ -3,6 +3,10 @@ export default defineNuxtConfig({
   compatibilityDate: '2025-01-17',
   devtools: { enabled: true },
   modules: ['@pinia/nuxt', '@nuxtjs/tailwindcss', '@nuxt/image', '@nuxt/icon'],
+  image: {
+    // Pass-through mode: keep remote `src` URLs as-is (no `/.netlify/images?...` rewriting).
+    provider: 'none',
+  },
   components: [
     { path: '~/components/ui', pathPrefix: false },
     { path: '~/components/common', pathPrefix: false },
