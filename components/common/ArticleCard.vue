@@ -3,7 +3,7 @@
     <NuxtLink :to="linkTo" :class="linkClasses">
       <div :class="imageWrapperClasses">
         <NuxtImg
-          :src="resolvedImageSrc"
+          :src="article.urlToImage"
           :placeholder="PLACEHOLDER_ARTICLE_IMAGE"
           :alt="article.title || 'Article image placeholder'"
           :class="imageClasses"
