@@ -5,26 +5,24 @@
  * Modification History: Initial creation for resolving article images with placeholder fallback.
  * Summary: Provides a small helper composable to resolve the correct image source for articles, falling back to a shared placeholder when needed.
  * Functions: use_article_image.
- * Variables: resolved_image_src.
+ * Variables: resolved_image_src, handle_image_error.
  */
 
-import type { ComputedRef } from 'vue'
+import type { ComputedRef, Ref } from 'vue'
 import type { Article } from '~/models/domain'
 import { PLACEHOLDER_ARTICLE_IMAGE } from '~/utils/assets'
 
 interface UseArticleImageResult {
   resolved_image_src: ComputedRef<string>
+  handle_image_error: () => void
 }
 
 export function use_article_image(article: ComputedRef<Article | null> | Article): UseArticleImageResult
 {
+  const did_image_error: Ref<boolean> = ref(false)
+
   const article_ref: ComputedRef<Article | null> =
-    typeof (article as any).value !== 'undefined'
-      ? (article as ComputedRef<Article | null>)
-      : computed(() =>
-      {
-        return article as Article
-      })
+    isRef(article) ? (article as ComputedRef<Article | null>) : computed(() => article as Article)
 
   const resolved_image_src = computed((): string =>
   {
@@ -40,11 +38,22 @@ export function use_article_image(article: ComputedRef<Article | null> | Article
       return PLACEHOLDER_ARTICLE_IMAGE
     }
 
+    if (did_image_error.value)
+    {
+      return PLACEHOLDER_ARTICLE_IMAGE
+    }
+
     return current_article.urlToImage
   })
 
+  const handle_image_error = (): void =>
+  {
+    did_image_error.value = true
+  }
+
   return {
     resolved_image_src,
+    handle_image_error,
   }
 }
 

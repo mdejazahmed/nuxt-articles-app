@@ -8,7 +8,7 @@
  * Variables: PLACEHOLDER_ARTICLE_IMAGE, ICONS.
  */
 
-export const PLACEHOLDER_ARTICLE_IMAGE = '~/assets/images/article-placeholder.png'
+export const PLACEHOLDER_ARTICLE_IMAGE: string = '/images/article-placeholder.png'
 
 export const ICONS: Record<string, string> = {
   'ui/arrow-right': 'ui/arrow-right',

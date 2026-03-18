@@ -14,6 +14,7 @@
           :src="resolved_image_src"
           :alt="article.title || 'Article image placeholder'"
           class="h-full w-full object-cover"
+          @error="handle_image_error"
         />
       </div>
       <div class="p-6">
@@ -69,7 +70,7 @@ const article = computed(() => {
   return articles.value.find((a) => a.id === id.value) ?? null
 })
 
-const { resolved_image_src } = use_article_image(article)
+const { resolved_image_src, handle_image_error } = use_article_image(article)
 
 const formatted_date = computed(() =>
   article.value ? format_display_date(article.value.publishedAt) : ''

@@ -9,6 +9,7 @@
           :alt="article.title || 'Article image placeholder'"
           class="h-full w-full object-cover"
           loading="lazy"
+          @error="handle_image_error"
         />
       </div>
       <div class="flex flex-1 flex-col p-4">
@@ -64,5 +65,5 @@ const props = defineProps<Props>()
 
 const link_to = computed((): string => `/articles/${props.article.id}`)
 const formatted_date = computed((): string => format_display_date(props.article.publishedAt))
-const { resolved_image_src } = use_article_image(props.article)
+const { resolved_image_src, handle_image_error } = use_article_image(props.article)
 </script>
