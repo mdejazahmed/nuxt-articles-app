@@ -4,6 +4,7 @@
       <div :class="imageWrapperClasses">
         <NuxtImg
           :src="resolvedImageSrc"
+          :placeholder="PLACEHOLDER_ARTICLE_IMAGE"
           :alt="article.title || 'Article image placeholder'"
           :class="imageClasses"
           loading="lazy"
@@ -50,6 +51,7 @@
 import type { Article } from '~/models/domain'
 import { formatDisplayDate } from '~/utils/format-date'
 import { useArticleImage } from '~/composables/useArticleImage'
+import { PLACEHOLDER_ARTICLE_IMAGE } from '~/utils/assets'
 
 /**
  * Module: ArticleCard

@@ -54,6 +54,7 @@
         <div class="aspect-video w-full overflow-hidden">
           <NuxtImg
             :src="resolvedImageSrc"
+            :placeholder="PLACEHOLDER_ARTICLE_IMAGE"
             :alt="article?.title || 'Article image placeholder'"
             class="h-full w-full object-cover"
             @error="handleImageError"
@@ -126,8 +127,10 @@
  */
 definePageMeta({ layout: false })
 
+import type { Article } from '~/models/domain'
 import { formatDisplayDate } from '~/utils/format-date'
 import { useArticleImage } from '~/composables/useArticleImage'
+import { PLACEHOLDER_ARTICLE_IMAGE } from '~/utils/assets'
 
 // #region variables
 const route = useRoute()
@@ -172,7 +175,7 @@ watch(
 const article = computed(() => {
   const fromStore = store.articleById(id.value)
   if (fromStore) return fromStore
-  return articles.value.find((a) => a.id === id.value) ?? null
+  return articles.value.find((a: Article) => a.id === id.value) ?? null
 })
 
 const { resolvedImageSrc, handleImageError } = useArticleImage(article)
