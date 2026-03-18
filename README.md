@@ -11,6 +11,8 @@ npm run dev
 
 Open [http://localhost:3000](http://localhost:3000).
 
+For detailed setup and test commands, see `docs/SETUP.md`.
+
 - **Build**: `npm run build`
 - **Preview**: `npm run preview`
 
@@ -62,4 +64,3 @@ No environment variables are required; the API URL is set in `nuxt.config.ts` an
 - **E2E**: Playwright for list → detail → back and for error/retry flows.
 - **Deploy**: Vercel or Netlify with a one-command deploy and document the URL in the README.
 - **Offline detection**: Use `navigator.onLine` in a composable and show a banner when offline, with a prompt to refresh when back online.
-# nuxt-articles-app 
