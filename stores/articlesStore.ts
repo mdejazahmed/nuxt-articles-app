@@ -10,6 +10,8 @@ export const use_articles_store = defineStore('articles', {
   state: () => ({
     articles: [] as Article[],
     favorites: [] as string[],
+    view_mode: 'grid' as 'grid' | 'list',
+    search_query: '',
   }),
 
   getters: {
@@ -23,6 +25,28 @@ export const use_articles_store = defineStore('articles', {
 
     article_by_id(): (id: string) => Article | undefined {
       return (id: string) => this.articles.find((a) => a.id === id)
+    },
+
+    filtered_articles(): Article[] {
+      if (!this.search_query) {
+        return this.articles
+      }
+
+      const needle = this.search_query.toLowerCase()
+
+      return this.articles.filter((item) => {
+        const title = item.title?.toLowerCase() ?? ''
+        const description = item.description?.toLowerCase() ?? ''
+        const author = item.author?.toLowerCase() ?? ''
+        const source_name = item.sourceName?.toLowerCase() ?? ''
+
+        return (
+          title.includes(needle) ||
+          description.includes(needle) ||
+          author.includes(needle) ||
+          source_name.includes(needle)
+        )
+      })
     },
   },
 
@@ -38,6 +62,14 @@ export const use_articles_store = defineStore('articles', {
       } else {
         this.favorites.splice(idx, 1)
       }
+    },
+
+    set_view_mode(mode: 'grid' | 'list'): void {
+      this.view_mode = mode
+    },
+
+    set_search_query(query: string): void {
+      this.search_query = query
     },
   },
 })

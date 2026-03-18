@@ -9,20 +9,34 @@
       </NuxtLink>
       <div class="flex items-center gap-3">
         <button
+          v-if="show_view_toggle"
+          type="button"
+          class="flex h-9 w-9 items-center justify-center rounded-full bg-slate-800/60 text-white hover:bg-slate-700/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
+          :aria-label="view_toggle_aria_label"
+          @click="handle_toggle_view_mode"
+        >
+          <Icon
+            v-if="is_grid_view"
+            name="mdi:view-grid-outline"
+            class="h-5 w-5"
+          />
+          <Icon
+            v-else
+            name="mdi:format-list-bulleted"
+            class="h-5 w-5"
+          />
+        </button>
+        <button
+          v-if="show_search_toggle"
           type="button"
           class="flex h-9 w-9 items-center justify-center rounded-full bg-slate-800/60 text-white hover:bg-slate-700/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
           aria-label="Search articles"
+          @click="$emit('toggle-search')"
         >
-          <span class="block h-4 w-4 rounded-full border-2 border-current" />
-        </button>
-        <button
-          type="button"
-          class="flex h-9 w-9 items-center justify-center rounded-full bg-slate-800/60 text-white hover:bg-slate-700/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
-          aria-label="Open favorites"
-        >
-          <span class="relative block h-4 w-4 border-2 border-current">
-            <span class="absolute inset-0 m-[1px] bg-current" />
-          </span>
+          <Icon
+            name="mdi:magnify"
+            class="h-5 w-5"
+          />
         </button>
       </div>
     </div>
@@ -39,4 +53,31 @@
  * Functions: None.
  * Variables: None.
  */
+interface Props {
+  show_view_toggle?: boolean
+  show_search_toggle?: boolean
+  view_mode?: 'grid' | 'list'
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  show_view_toggle: false,
+  show_search_toggle: false,
+  view_mode: 'grid',
+})
+
+const emit = defineEmits<{
+  (event: 'toggle-view'): void
+  (event: 'toggle-search'): void
+}>()
+
+const is_grid_view = computed((): boolean => props.view_mode === 'grid')
+
+const view_toggle_aria_label = computed((): string =>
+  is_grid_view.value ? 'Switch to list view' : 'Switch to grid view',
+)
+
+const handle_toggle_view_mode = (): void =>
+{
+  emit('toggle-view')
+}
 </script>
