@@ -3,12 +3,23 @@
     <button
       v-if="saveButtonMode !== 'off'"
       type="button"
-      class="absolute right-2 top-2 z-20 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-slate-900/55 text-white shadow-sm ring-1 ring-white/10 transition hover:bg-slate-900/75 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-400/80"
+      class="absolute right-2 top-2 z-20 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-slate-900/55 text-white shadow-sm ring-1 ring-white/10 transition duration-motion-medium ease-motion-standard hover:bg-slate-900/75 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-teal-400/80"
       :aria-label="bookmarkAriaLabel"
       :aria-pressed="bookmarkPressed"
       @click.stop.prevent="handleBookmarkClick"
     >
-      <Icon :name="bookmarkIconName" class="h-5 w-5" />
+      <span class="relative flex h-5 w-5 items-center justify-center">
+        <Transition
+          mode="out-in"
+          name="save-icon"
+        >
+          <Icon
+            :key="bookmarkIconName"
+            :name="bookmarkIconName"
+            class="h-5 w-5"
+          />
+        </Transition>
+      </span>
     </button>
     <NuxtLink :to="linkTo" :class="linkClasses">
       <div :class="imageWrapperClasses">
@@ -93,7 +104,7 @@ const isListVariant = computed((): boolean => props.variant === 'list')
 
 const cardClasses = computed(
   () =>
-    'overflow-hidden rounded-2xl bg-[#233D46] text-white shadow-md ring-1 ring-slate-900/40 transition hover:shadow-lg',
+    'overflow-hidden rounded-2xl bg-[#233D46] text-white shadow-md ring-1 ring-slate-900/40 transition duration-motion-medium ease-motion-standard hover:shadow-lg',
 )
 
 const linkClasses = computed(

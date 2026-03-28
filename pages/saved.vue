@@ -36,8 +36,11 @@
         Browse articles
       </NuxtLink>
     </EmptyState>
-    <ul
+    <TransitionGroup
       v-else
+      tag="ul"
+      name="article-list"
+      class="article-list-root"
       :class="isGridView ? listClassesGrid : listClassesList"
     >
       <li
@@ -79,7 +82,7 @@
           Remove from saved
         </button>
       </li>
-    </ul>
+    </TransitionGroup>
   </div>
 </template>
 

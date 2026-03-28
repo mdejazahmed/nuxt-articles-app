@@ -2,6 +2,7 @@
 export default defineNuxtConfig({
   compatibilityDate: '2025-01-17',
   devtools: { enabled: true },
+  css: ['~/assets/css/motion.css'],
   modules: ['@pinia/nuxt', '@nuxtjs/tailwindcss', '@nuxt/image', '@nuxt/icon'],
   image: {
     // Pass-through mode: keep remote `src` URLs as-is (no `/.netlify/images?...` rewriting).
@@ -21,6 +22,7 @@ export default defineNuxtConfig({
     },
   },
   app: {
+    pageTransition: { name: 'page', mode: 'out-in' },
     head: {
       title: 'Articles',
       meta: [

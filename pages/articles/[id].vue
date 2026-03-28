@@ -6,7 +6,7 @@
       <header class="bg-[#233D46] sticky top-0 z-50 flex h-14  items-center justify-between px-4">
         <NuxtLink
           to="/"
-          class="flex h-10 w-10 items-center justify-center rounded-full bg-slate-800/40 text-white transition hover:bg-slate-800/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
+          class="flex h-10 w-10 items-center justify-center rounded-full bg-slate-800/40 text-white transition duration-motion-medium ease-motion-standard hover:bg-slate-800/70 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
           aria-label="Back to articles"
         >
           <Icon name="mdi:arrow-left" class="h-6 w-6" />
@@ -17,20 +17,28 @@
         <div class="flex items-center gap-2">
           <button
             type="button"
-            class="flex h-10 w-10 items-center justify-center rounded-full transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
+            class="flex h-10 w-10 items-center justify-center rounded-full transition duration-motion-medium ease-motion-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
             :class="saveBookmarkButtonClasses"
             aria-label="Save for later"
             :aria-pressed="isArticleSaved"
             @click="handleToggleSave"
           >
-            <Icon
-              :name="isArticleSaved ? 'mdi:bookmark' : 'mdi:bookmark-outline'"
-              class="h-6 w-6"
-            />
+            <span class="relative flex h-6 w-6 items-center justify-center">
+              <Transition
+                mode="out-in"
+                name="save-icon"
+              >
+                <Icon
+                  :key="isArticleSaved ? 'saved' : 'unsaved'"
+                  :name="isArticleSaved ? 'mdi:bookmark' : 'mdi:bookmark-outline'"
+                  class="h-6 w-6"
+                />
+              </Transition>
+            </span>
           </button>
           <button
             type="button"
-            class="flex h-10 w-10 items-center justify-center rounded-full transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
+            class="flex h-10 w-10 items-center justify-center rounded-full transition duration-motion-medium ease-motion-standard focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
             :class="reactionButtonClasses"
             aria-label="Toggle like/dislike"
             :aria-pressed="isArticleLiked || isArticleDisliked"

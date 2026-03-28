@@ -1,6 +1,8 @@
 <template>
   <Teleport to="body">
-    <div
+    <TransitionGroup
+      name="toast"
+      tag="div"
       class="pointer-events-none fixed bottom-4 right-4 z-50 flex max-w-sm flex-col gap-3 max-sm:left-4 max-sm:max-w-none"
     >
       <ToastItem
@@ -8,7 +10,7 @@
         :key="t.id"
         :toast="t"
       />
-    </div>
+    </TransitionGroup>
   </Teleport>
 </template>
 

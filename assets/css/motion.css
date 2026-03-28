@@ -1,0 +1,146 @@
+/**
+ * Motion tokens: durations and easing. Override in one place; components use
+ * Tailwind aliases (duration-motion-*, ease-motion-*) or these variables in CSS.
+ */
+:root {
+  --motion-duration-instant: 1ms;
+  --motion-duration-short: 180ms;
+  --motion-duration-medium: 280ms;
+  --motion-duration-long: 400ms;
+  --motion-ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --motion-ease-emphasized: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --motion-duration-instant: 1ms;
+    --motion-duration-short: 1ms;
+    --motion-duration-medium: 1ms;
+    --motion-duration-long: 1ms;
+    --motion-ease-standard: linear;
+    --motion-ease-emphasized: linear;
+  }
+}
+
+/* Page navigation (Nuxt pageTransition name: page) */
+.page-enter-active,
+.page-leave-active {
+  transition:
+    opacity var(--motion-duration-medium) var(--motion-ease-standard),
+    transform var(--motion-duration-medium) var(--motion-ease-standard);
+}
+
+.page-enter-from,
+.page-leave-to {
+  opacity: 0;
+  transform: translateY(0.75rem);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-enter-from,
+  .page-leave-to {
+    transform: none;
+  }
+}
+
+/* Article list filter (TransitionGroup name: article-list) */
+.article-list-move,
+.article-list-enter-active,
+.article-list-leave-active {
+  transition:
+    opacity var(--motion-duration-medium) var(--motion-ease-standard),
+    transform var(--motion-duration-medium) var(--motion-ease-standard);
+}
+
+.article-list-enter-from,
+.article-list-leave-to {
+  opacity: 0;
+  transform: scale(0.98);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .article-list-enter-from,
+  .article-list-leave-to {
+    transform: none;
+  }
+}
+
+.article-list-root {
+  position: relative;
+}
+
+/* Toast stack (TransitionGroup name: toast) */
+.toast-enter-active {
+  transition:
+    opacity var(--motion-duration-medium) var(--motion-ease-standard),
+    transform var(--motion-duration-medium) var(--motion-ease-emphasized);
+}
+
+.toast-leave-active {
+  transition: opacity var(--motion-duration-short) var(--motion-ease-standard);
+}
+
+.toast-enter-from {
+  opacity: 0;
+  transform: translate(0.75rem, 0.75rem);
+}
+
+.toast-leave-to {
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toast-enter-from {
+    transform: none;
+  }
+}
+
+/* Save bookmark icon swap (Transition name: save-icon) */
+.save-icon-enter-active,
+.save-icon-leave-active {
+  transition:
+    opacity var(--motion-duration-short) var(--motion-ease-standard),
+    transform var(--motion-duration-short) var(--motion-ease-standard);
+}
+
+.save-icon-enter-from,
+.save-icon-leave-to {
+  opacity: 0;
+  transform: scale(0.85);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .save-icon-enter-from,
+  .save-icon-leave-to {
+    transform: none;
+  }
+}
+
+/* Search drawer: backdrop (name: drawer-backdrop) */
+.drawer-backdrop-enter-active,
+.drawer-backdrop-leave-active {
+  transition: opacity var(--motion-duration-medium) var(--motion-ease-standard);
+}
+
+.drawer-backdrop-enter-from,
+.drawer-backdrop-leave-to {
+  opacity: 0;
+}
+
+/* Search drawer: panel (name: drawer-panel) */
+.drawer-panel-enter-active,
+.drawer-panel-leave-active {
+  transition: transform var(--motion-duration-medium) var(--motion-ease-emphasized);
+}
+
+.drawer-panel-enter-from,
+.drawer-panel-leave-to {
+  transform: translateX(100%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .drawer-panel-enter-from,
+  .drawer-panel-leave-to {
+    transform: none;
+  }
+}
