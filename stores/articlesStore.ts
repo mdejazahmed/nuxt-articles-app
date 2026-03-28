@@ -1,10 +1,24 @@
 /**
- * Pinia store for articles and optional favorites.
- * Hydrated from useArticles() in the list page to avoid duplicate fetch.
+ * Pinia store for articles, likes/dislikes, and reading list (saved article IDs).
+ * Hydrated from useArticles() on list/detail/saved pages.
+ * Reading list IDs persist via pinia-plugin-persistedstate (paths: savedArticleIds).
  */
 
 import { defineStore } from 'pinia'
 import type { Article } from '~/models/domain'
+
+/** Delay before a scheduled unsave commits (undo window on /saved). */
+export const readingListUndoMs = 4000
+
+const removalTimers = new Map<string, ReturnType<typeof setTimeout>>()
+
+/** Clears pending /saved removal timers (used in tests to avoid cross-test leaks). */
+export function resetReadingListRemovalTimers(): void {
+  removalTimers.forEach((t) => {
+    clearTimeout(t)
+  })
+  removalTimers.clear()
+}
 
 export const useArticlesStore = defineStore('articles', {
   state: () => ({
@@ -13,6 +27,9 @@ export const useArticlesStore = defineStore('articles', {
     dislikes: [] as string[],
     viewMode: 'grid' as 'grid' | 'list',
     searchQuery: '',
+    savedArticleIds: [] as string[],
+    /** IDs currently in the /saved “undo” window (still in savedArticleIds). */
+    scheduledRemovalIds: [] as string[],
   }),
 
   getters: {
@@ -58,6 +75,26 @@ export const useArticlesStore = defineStore('articles', {
         )
       })
     },
+
+    savedCount(): number {
+      return this.savedArticleIds.length
+    },
+
+    isSaved(): (id: string) => boolean {
+      return (id: string) => this.savedArticleIds.includes(id)
+    },
+
+    isScheduledForRemoval(): (id: string) => boolean {
+      return (id: string) => this.scheduledRemovalIds.includes(id)
+    },
+
+    /** Saved articles in MRU order (savedArticleIds order). */
+    savedArticlesOrdered(): Article[] {
+      const by_id = new Map(this.articles.map((a) => [a.id, a]))
+      return this.savedArticleIds
+        .map((id) => by_id.get(id))
+        .filter((a): a is Article => a !== undefined)
+    },
   },
 
   actions: {
@@ -69,7 +106,6 @@ export const useArticlesStore = defineStore('articles', {
       const idx = this.favorites.indexOf(id)
       if (idx === -1) {
         this.favorites.push(id)
-        // Dislike and like are mutually exclusive (dislike cancels like).
         const dislikeIdx = this.dislikes.indexOf(id)
         if (dislikeIdx !== -1) {
           this.dislikes.splice(dislikeIdx, 1)
@@ -83,7 +119,6 @@ export const useArticlesStore = defineStore('articles', {
       const idx = this.dislikes.indexOf(id)
       if (idx === -1) {
         this.dislikes.push(id)
-        // Dislike and like are mutually exclusive (dislike cancels like).
         const likeIdx = this.favorites.indexOf(id)
         if (likeIdx !== -1) {
           this.favorites.splice(likeIdx, 1)
@@ -94,7 +129,6 @@ export const useArticlesStore = defineStore('articles', {
     },
 
     toggleFavorite(id: string): void {
-      // Kept as a friendly alias; favorites map to likes.
       this.toggleLike(id)
     },
 
@@ -105,6 +139,74 @@ export const useArticlesStore = defineStore('articles', {
     setSearchQuery(query: string): void {
       this.searchQuery = query
     },
+
+    /**
+     * Adds id to the front of the reading list (MRU). Clears any pending removal for that id.
+     */
+    saveArticle(id: string): void {
+      this.cancelScheduledUnsave(id)
+      const next = this.savedArticleIds.filter((x) => x !== id)
+      next.unshift(id)
+      this.savedArticleIds = next
+    },
+
+    /**
+     * Removes id immediately from reading list and clears pending removal timers.
+     */
+    removeSavedArticleImmediate(id: string): void {
+      this.cancelScheduledUnsave(id)
+      this.savedArticleIds = this.savedArticleIds.filter((x) => x !== id)
+    },
+
+    toggleSaveImmediate(id: string): void {
+      if (this.savedArticleIds.includes(id)) {
+        this.removeSavedArticleImmediate(id)
+      } else {
+        this.saveArticle(id)
+      }
+    },
+
+    /**
+     * /saved only: start undo window; id stays in savedArticleIds until timer fires.
+     */
+    scheduleUnsaveFromReadingList(id: string): void {
+      if (!this.savedArticleIds.includes(id)) {
+        return
+      }
+
+      if (this.scheduledRemovalIds.includes(id)) {
+        return
+      }
+
+      this.scheduledRemovalIds.push(id)
+      const timer = setTimeout(() => {
+        removalTimers.delete(id)
+        this.commitScheduledUnsave(id)
+      }, readingListUndoMs)
+      removalTimers.set(id, timer)
+    },
+
+    cancelScheduledUnsave(id: string): void {
+      const t = removalTimers.get(id)
+      if (t !== undefined) {
+        clearTimeout(t)
+        removalTimers.delete(id)
+      }
+
+      this.scheduledRemovalIds = this.scheduledRemovalIds.filter((x) => x !== id)
+    },
+
+    commitScheduledUnsave(id: string): void {
+      if (!this.scheduledRemovalIds.includes(id)) {
+        return
+      }
+
+      this.scheduledRemovalIds = this.scheduledRemovalIds.filter((x) => x !== id)
+      this.savedArticleIds = this.savedArticleIds.filter((x) => x !== id)
+    },
+  },
+
+  persist: {
+    paths: ['savedArticleIds'],
   },
 })
- 

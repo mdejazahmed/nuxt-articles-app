@@ -1,9 +1,10 @@
 <template>
   <div class="min-h-screen bg-slate-100">
     <AppHeader
-      :showViewToggle="isArticlesIndex"
+      :showViewToggle="showLayoutToggle"
       :showSearchToggle="isArticlesIndex"
       :viewMode="articlesStore.viewMode"
+      :savedCount="articlesStore.savedCount"
       @toggle-view="handleToggleView"
       @toggle-search="handleToggleSearch"
     />
@@ -16,14 +17,17 @@
 <script setup lang="ts">
 /**
  * Default layout: header + main content area.
- * For the articles index page, the header also exposes view and search controls
- * that are wired to the articles store and a shared search-open state.
+ * Index and /saved share the grid–list view toggle; search is index-only.
  */
 
 const route = useRoute()
 const articlesStore = useArticlesStore()
 
 const isArticlesIndex = computed(() => route.name === 'index')
+
+const showLayoutToggle = computed(
+  () => route.name === 'index' || route.name === 'saved',
+)
 
 const searchOpenState = useState<boolean>('articles-search-open', () => false)
 

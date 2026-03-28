@@ -14,7 +14,20 @@
         <div class="flex-1 text-center text-sm font-semibold text-white/95">
           Article
         </div>
-        <div class="flex items-center gap-3">
+        <div class="flex items-center gap-2">
+          <button
+            type="button"
+            class="flex h-10 w-10 items-center justify-center rounded-full transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
+            :class="saveBookmarkButtonClasses"
+            aria-label="Save for later"
+            :aria-pressed="isArticleSaved"
+            @click="handleToggleSave"
+          >
+            <Icon
+              :name="isArticleSaved ? 'mdi:bookmark' : 'mdi:bookmark-outline'"
+              class="h-6 w-6"
+            />
+          </button>
           <button
             type="button"
             class="flex h-10 w-10 items-center justify-center rounded-full transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
@@ -64,6 +77,13 @@
     </div>
 
     <main class="mx-auto max-w-4xl px-4 pb-10 pt-6">
+      <p
+        v-if="persistError"
+        class="mb-4 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900"
+        role="alert"
+      >
+        {{ persistError }}
+      </p>
       <Loader v-if="pending && !article" />
 
       <div
@@ -119,11 +139,12 @@
  * Module: ArticleDetailPage
  * Creator: user
  * Creation Date: 2026-03-18
- * Modification History: Updated detail layout to match dark article design with back and like/dislike actions.
- * Summary: Renders a single article detail with a top bar (back arrow, like, dislike).
+ * Modification History: Added save-for-later bookmark next to like/dislike; persist error banner when storage fails.
+ * Summary: Renders a single article detail with a top bar (back, save, like/dislike).
  * Functions:
  * - handleToggleReaction: alternates like/dislike for the current article.
- * Variables accessed: route, id, articles, pending, error, refresh, store, article, resolvedImageSrc, handleImageError.
+ * - handleToggleSave: toggles reading list membership with optimistic persist probe.
+ * Variables accessed: route, id, articles, pending, error, refresh, store, article, resolvedImageSrc, handleImageError, useReadingList.
  */
 definePageMeta({ layout: false })
 
@@ -139,9 +160,11 @@ const articleId = computed((): string => id.value)
 
 const { articles, pending, error, refresh } = useArticles()
 const store = useArticlesStore()
+const { toggleSaveImmediate, persistError } = useReadingList()
 // #endregion
 
 // #region store-backed state
+const isArticleSaved = computed((): boolean => store.isSaved(articleId.value))
 const isArticleLiked = computed((): boolean => store.isLiked(articleId.value))
 const isArticleDisliked = computed((): boolean => store.isDisliked(articleId.value))
 
@@ -153,6 +176,12 @@ const reactionIconName = computed((): string => {
 
 const reactionButtonClasses = computed((): string =>
   isArticleLiked.value || isArticleDisliked.value
+    ? 'bg-[#195A94] text-white'
+    : 'bg-slate-800/40 text-white/80 hover:bg-slate-800/70',
+)
+
+const saveBookmarkButtonClasses = computed((): string =>
+  isArticleSaved.value
     ? 'bg-[#195A94] text-white'
     : 'bg-slate-800/40 text-white/80 hover:bg-slate-800/70',
 )
@@ -197,6 +226,11 @@ const handleToggleReaction = (): void => {
   }
 
   store.toggleLike(articleId.value)
+}
+
+const handleToggleSave = async (): Promise<void> => {
+  if (!article.value) return
+  await toggleSaveImmediate(articleId.value)
 }
 // #endregion
 </script>

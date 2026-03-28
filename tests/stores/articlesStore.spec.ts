@@ -1,12 +1,17 @@
-import { describe, expect, it, beforeEach } from 'vitest'
+import { describe, expect, it, beforeEach, afterEach, vi } from 'vitest'
 import { createPinia, setActivePinia } from 'pinia'
-import { useArticlesStore } from '~/stores/articlesStore'
+import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
+import {
+  useArticlesStore,
+  resetReadingListRemovalTimers,
+  readingListUndoMs,
+} from '~/stores/articlesStore'
 import type { Article } from '~/models/domain'
 
-function build_article(article_id: string, overrides: Partial<Article>): Article
+function buildArticle(articleId: string, overrides: Partial<Article>): Article
 {
-  const base_article: Article = {
-    id: article_id,
+  const baseArticle: Article = {
+    id: articleId,
     title: '',
     description: '',
     author: '',
@@ -18,9 +23,9 @@ function build_article(article_id: string, overrides: Partial<Article>): Article
   }
 
   return {
-    ...base_article,
+    ...baseArticle,
     ...overrides,
-    id: article_id,
+    id: articleId,
   }
 }
 
@@ -30,27 +35,36 @@ describe('articlesStore', () =>
 
   beforeEach(() =>
   {
-    setActivePinia(createPinia())
+    resetReadingListRemovalTimers()
+    const pinia = createPinia()
+    pinia.use(piniaPluginPersistedstate)
+    setActivePinia(pinia)
     store = useArticlesStore()
+  })
+
+  afterEach(() =>
+  {
+    resetReadingListRemovalTimers()
+    vi.useRealTimers()
   })
 
   it('filters articles across multiple fields (case-insensitive)', () =>
   {
-    const article_1 = build_article('a1', {
+    const article1 = buildArticle('a1', {
       title: 'Nuxt tips',
       description: 'Teal background',
       author: 'Alice',
       sourceName: 'Teal News',
     })
 
-    const article_2 = build_article('a2', {
+    const article2 = buildArticle('a2', {
       title: 'Vue world',
       description: 'Something else',
       author: 'Bob',
       sourceName: 'Blue Daily',
     })
 
-    store.setArticles([article_1, article_2])
+    store.setArticles([article1, article2])
 
     store.setSearchQuery('teal')
     const filtered = store.filteredArticles
@@ -61,38 +75,103 @@ describe('articlesStore', () =>
 
   it('keeps like/dislike mutually exclusive', () =>
   {
-    const target_id = 'article-1'
+    const targetId = 'article-1'
 
-    store.toggleLike(target_id)
-    expect(store.favorites).toContain(target_id)
-    expect(store.dislikes).not.toContain(target_id)
+    store.toggleLike(targetId)
+    expect(store.favorites).toContain(targetId)
+    expect(store.dislikes).not.toContain(targetId)
 
-    store.toggleDislike(target_id)
-    expect(store.dislikes).toContain(target_id)
-    expect(store.favorites).not.toContain(target_id)
+    store.toggleDislike(targetId)
+    expect(store.dislikes).toContain(targetId)
+    expect(store.favorites).not.toContain(targetId)
 
-    store.toggleLike(target_id)
-    expect(store.favorites).toContain(target_id)
-    expect(store.dislikes).not.toContain(target_id)
+    store.toggleLike(targetId)
+    expect(store.favorites).toContain(targetId)
+    expect(store.dislikes).not.toContain(targetId)
   })
 
   it('toggleLike removes the favorite when called twice', () =>
   {
-    const target_id = 'article-2'
+    const targetId = 'article-2'
 
-    store.toggleLike(target_id)
-    expect(store.favorites).toContain(target_id)
+    store.toggleLike(targetId)
+    expect(store.favorites).toContain(targetId)
 
-    store.toggleLike(target_id)
-    expect(store.favorites).not.toContain(target_id)
+    store.toggleLike(targetId)
+    expect(store.favorites).not.toContain(targetId)
   })
 
   it('toggleFavorite is a backwards-compatible alias', () =>
   {
-    const target_id = 'article-3'
+    const targetId = 'article-3'
 
-    store.toggleFavorite(target_id)
-    expect(store.favorites).toContain(target_id)
+    store.toggleFavorite(targetId)
+    expect(store.favorites).toContain(targetId)
+  })
+
+  it('keeps reading list independent from likes', () =>
+  {
+    const id = 'article-rl-1'
+
+    store.toggleLike(id)
+    store.saveArticle(id)
+
+    expect(store.favorites).toContain(id)
+    expect(store.savedArticleIds).toContain(id)
+
+    store.toggleLike(id)
+    expect(store.favorites).not.toContain(id)
+    expect(store.savedArticleIds).toContain(id)
+  })
+
+  it('orders saved articles MRU (most recent first)', () =>
+  {
+    store.saveArticle('a')
+    store.saveArticle('b')
+    store.saveArticle('a')
+
+    expect(store.savedArticleIds).toEqual(['a', 'b'])
+  })
+
+  it('scheduled unsave keeps id in savedArticleIds until timer commits', () =>
+  {
+    vi.useFakeTimers()
+    store.saveArticle('x')
+
+    store.scheduleUnsaveFromReadingList('x')
+    expect(store.savedArticleIds).toContain('x')
+    expect(store.scheduledRemovalIds).toContain('x')
+
+    vi.advanceTimersByTime(readingListUndoMs - 1)
+    expect(store.savedArticleIds).toContain('x')
+
+    vi.advanceTimersByTime(1)
+    expect(store.savedArticleIds).not.toContain('x')
+    expect(store.scheduledRemovalIds).not.toContain('x')
+  })
+
+  it('cancelScheduledUnsave clears undo window and keeps the article saved', () =>
+  {
+    vi.useFakeTimers()
+    store.saveArticle('y')
+
+    store.scheduleUnsaveFromReadingList('y')
+    store.cancelScheduledUnsave('y')
+
+    vi.advanceTimersByTime(readingListUndoMs)
+    expect(store.savedArticleIds).toContain('y')
+    expect(store.scheduledRemovalIds).not.toContain('y')
+  })
+
+  it('removeSavedArticleImmediate clears a pending scheduled unsave', () =>
+  {
+    vi.useFakeTimers()
+    store.saveArticle('z')
+
+    store.scheduleUnsaveFromReadingList('z')
+    store.removeSavedArticleImmediate('z')
+
+    vi.advanceTimersByTime(readingListUndoMs)
+    expect(store.savedArticleIds).not.toContain('z')
   })
 })
-
