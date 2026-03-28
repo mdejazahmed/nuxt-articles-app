@@ -2,6 +2,9 @@
   <NuxtLayout>
     <NuxtPage />
   </NuxtLayout>
+  <ClientOnly>
+    <ToastHost />
+  </ClientOnly>
 </template>
 
 <script setup lang="ts">

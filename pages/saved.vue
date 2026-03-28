@@ -7,14 +7,6 @@
       Articles you bookmarked from the list or detail page. Unsave here with a short undo window.
     </p>
 
-    <p
-      v-if="persistError"
-      class="mb-4 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900"
-      role="alert"
-    >
-      {{ persistError }}
-    </p>
-
     <ul
       v-if="pending"
       :class="isGridView ? listClassesGrid : listClassesList"
@@ -98,11 +90,7 @@
  */
 const { articles, pending, error, refresh } = useArticles()
 const store = useArticlesStore()
-const {
-  persistError,
-  toggleSaveImmediate,
-  cancelUnsaveOnReadingList,
-} = useReadingList()
+const { toggleSaveImmediate, cancelUnsaveOnReadingList } = useReadingList()
 
 const listClassesGrid = computed(
   () =>

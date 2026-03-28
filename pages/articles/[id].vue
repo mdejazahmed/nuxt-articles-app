@@ -77,13 +77,6 @@
     </div>
 
     <main class="mx-auto max-w-4xl px-4 pb-10 pt-6">
-      <p
-        v-if="persistError"
-        class="mb-4 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900"
-        role="alert"
-      >
-        {{ persistError }}
-      </p>
       <Loader v-if="pending && !article" />
 
       <div
@@ -139,7 +132,7 @@
  * Module: ArticleDetailPage
  * Creator: user
  * Creation Date: 2026-03-18
- * Modification History: Added save-for-later bookmark next to like/dislike; persist error banner when storage fails.
+ * Modification History: Save-for-later bookmark; persist failures surface via toast (useReadingList).
  * Summary: Renders a single article detail with a top bar (back, save, like/dislike).
  * Functions:
  * - handleToggleReaction: alternates like/dislike for the current article.
@@ -160,7 +153,7 @@ const articleId = computed((): string => id.value)
 
 const { articles, pending, error, refresh } = useArticles()
 const store = useArticlesStore()
-const { toggleSaveImmediate, persistError } = useReadingList()
+const { toggleSaveImmediate } = useReadingList()
 // #endregion
 
 // #region store-backed state

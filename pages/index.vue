@@ -3,13 +3,6 @@
     <h1 class="mb-6 text-2xl font-bold text-slate-900">
       Latest articles
     </h1>
-    <p
-      v-if="persistError"
-      class="mb-4 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900"
-      role="alert"
-    >
-      {{ persistError }}
-    </p>
     <div
       v-if="isSearchOpen"
       class="mb-4"
@@ -81,7 +74,6 @@
  */
 const { articles, pending, error, refresh } = useArticles()
 const store = useArticlesStore()
-const { persistError } = useReadingList()
 
 // #region variables
 const searchOpenState = useState<boolean>('articles-search-open', () => false)

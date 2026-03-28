@@ -1,39 +1,26 @@
 /**
  * Reading list: optimistic updates with async storage probe and rollback on failure.
  * Pinia persistedstate syncs savedArticleIds; we verify localStorage is writable after toggles.
+ * User feedback uses useToast (success / info + Undo / error).
  */
 
 import { assertReadingListStorageWritable } from '~/utils/reading-list-persist'
 
 /**
- * Toggles save on list/detail, or starts /saved undo flow; surfaces persist errors briefly.
+ * Toggles save on list/detail, or starts /saved undo flow; surfaces errors via toast.
  */
 export function useReadingList() {
   const store = useArticlesStore()
-  const persistError = useState<string | null>(
-    'reading-list-persist-error',
-    () => null,
-  )
-  let persistErrorTimer: ReturnType<typeof setTimeout> | null = null
-
-  function clearPersistErrorLater(): void {
-    if (persistErrorTimer !== null) {
-      clearTimeout(persistErrorTimer)
-    }
-
-    persistErrorTimer = setTimeout(() => {
-      persistError.value = null
-      persistErrorTimer = null
-    }, 4000)
-  }
+  const toast = useToast()
 
   /**
    * Immediate save/unsave (list + detail). Rolls back store if storage probe fails.
    */
   async function toggleSaveImmediate(articleId: string): Promise<boolean> {
-    persistError.value = null
     const previous = [...store.savedArticleIds]
+    const wasSaved = store.isSaved(articleId)
     store.toggleSaveImmediate(articleId)
+    const nowSaved = store.isSaved(articleId)
 
     if (import.meta.server) {
       return true
@@ -41,11 +28,22 @@ export function useReadingList() {
 
     try {
       await assertReadingListStorageWritable()
+      if (nowSaved) {
+        toast.success('Article saved')
+      } else {
+        toast.info('Removed from reading list', {
+          action: {
+            label: 'Undo',
+            onClick: (): void => {
+              void toggleSaveImmediate(articleId)
+            },
+          },
+        })
+      }
       return true
     } catch {
       store.$patch({ savedArticleIds: previous })
-      persistError.value = 'Could not update your reading list. Try again.'
-      clearPersistErrorLater()
+      toast.error('Could not update your reading list. Try again.')
       return false
     }
   }
@@ -54,7 +52,26 @@ export function useReadingList() {
    * /saved: begin undo window (id remains saved until timer commits).
    */
   function requestUnsaveOnReadingList(articleId: string): void {
+    const wasScheduled = store.isScheduledForRemoval(articleId)
     store.scheduleUnsaveFromReadingList(articleId)
+    const isScheduled = store.isScheduledForRemoval(articleId)
+
+    if (!import.meta.client) {
+      return
+    }
+
+    if (!isScheduled || wasScheduled) {
+      return
+    }
+
+    toast.info('Removing from reading list…', {
+      action: {
+        label: 'Undo',
+        onClick: (): void => {
+          cancelUnsaveOnReadingList(articleId)
+        },
+      },
+    })
   }
 
   function cancelUnsaveOnReadingList(articleId: string): void {
@@ -62,7 +79,6 @@ export function useReadingList() {
   }
 
   return {
-    persistError,
     toggleSaveImmediate,
     requestUnsaveOnReadingList,
     cancelUnsaveOnReadingList,
