@@ -196,7 +196,7 @@ const bookmarkAriaLabel = computed((): string => {
   return isSavedArticle.value ? 'Remove from reading list' : 'Save for later'
 })
 
-async function handleBookmarkClick(): Promise<void> {
+function handleBookmarkClick(): void {
   if (props.saveButtonMode === 'off') {
     return
   }
@@ -210,7 +210,7 @@ async function handleBookmarkClick(): Promise<void> {
     return
   }
 
-  await toggleSaveImmediate(props.article.id)
+  toggleSaveImmediate(props.article.id)
 }
 
 // #endregion

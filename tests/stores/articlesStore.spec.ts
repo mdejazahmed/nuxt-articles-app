@@ -1,6 +1,5 @@
 import { describe, expect, it, beforeEach, afterEach, vi } from 'vitest'
 import { createPinia, setActivePinia } from 'pinia'
-import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
 import {
   useArticlesStore,
   resetReadingListRemovalTimers,
@@ -37,7 +36,6 @@ describe('articlesStore', () =>
   {
     resetReadingListRemovalTimers()
     const pinia = createPinia()
-    pinia.use(piniaPluginPersistedstate)
     setActivePinia(pinia)
     store = useArticlesStore()
   })

@@ -144,7 +144,7 @@
  * Summary: Renders a single article detail with a top bar (back, save, like/dislike).
  * Functions:
  * - handleToggleReaction: alternates like/dislike for the current article.
- * - handleToggleSave: toggles reading list membership with optimistic persist probe.
+ * - handleToggleSave: toggles reading list membership (cookie-backed via plugin).
  * Variables accessed: route, id, articles, pending, error, refresh, store, article, resolvedImageSrc, handleImageError, useReadingList.
  */
 definePageMeta({ layout: false })
@@ -229,9 +229,9 @@ const handleToggleReaction = (): void => {
   store.toggleLike(articleId.value)
 }
 
-const handleToggleSave = async (): Promise<void> => {
+const handleToggleSave = (): void => {
   if (!article.value) return
-  await toggleSaveImmediate(articleId.value)
+  toggleSaveImmediate(articleId.value)
 }
 // #endregion
 </script>

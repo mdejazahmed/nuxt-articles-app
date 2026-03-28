@@ -1,10 +1,9 @@
 /**
- * Reading list: optimistic updates with async storage probe and rollback on failure.
- * Pinia persistedstate syncs savedArticleIds; we verify localStorage is writable after toggles.
+ * Reading list: immediate toggles validate cookie size before mutating; cookie sync runs via plugin watch.
  * User feedback uses useToast (success / info + Undo / error).
  */
 
-import { assertReadingListStorageWritable } from '~/utils/reading-list-persist'
+import { assertSavedArticleIdsFitCookie } from '~/utils/reading-list-cookie'
 
 /**
  * Toggles save on list/detail, or starts /saved undo flow; surfaces errors via toast.
@@ -14,11 +13,24 @@ export function useReadingList() {
   const toast = useToast()
 
   /**
-   * Immediate save/unsave (list + detail). Rolls back store if storage probe fails.
+   * Immediate save/unsave (list + detail). Client validates cookie size before mutating.
    */
-  async function toggleSaveImmediate(articleId: string): Promise<boolean> {
-    const previous = [...store.savedArticleIds]
+  function toggleSaveImmediate(articleId: string): boolean {
+    const current = [...store.savedArticleIds]
     const wasSaved = store.isSaved(articleId)
+    const nextIds = wasSaved
+      ? current.filter((id) => id !== articleId)
+      : [articleId, ...current.filter((id) => id !== articleId)]
+
+    if (import.meta.client) {
+      try {
+        assertSavedArticleIdsFitCookie(nextIds)
+      } catch {
+        toast.error('Could not update your reading list. Try again.')
+        return false
+      }
+    }
+
     store.toggleSaveImmediate(articleId)
     const nowSaved = store.isSaved(articleId)
 
@@ -26,26 +38,19 @@ export function useReadingList() {
       return true
     }
 
-    try {
-      await assertReadingListStorageWritable()
-      if (nowSaved) {
-        toast.success('Article saved')
-      } else {
-        toast.info('Removed from reading list', {
-          action: {
-            label: 'Undo',
-            onClick: (): void => {
-              void toggleSaveImmediate(articleId)
-            },
+    if (nowSaved) {
+      toast.success('Article saved')
+    } else {
+      toast.info('Removed from reading list', {
+        action: {
+          label: 'Undo',
+          onClick: (): void => {
+            toggleSaveImmediate(articleId)
           },
-        })
-      }
-      return true
-    } catch {
-      store.$patch({ savedArticleIds: previous })
-      toast.error('Could not update your reading list. Try again.')
-      return false
+        },
+      })
     }
+    return true
   }
 
   /**

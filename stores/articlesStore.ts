@@ -1,7 +1,7 @@
 /**
  * Pinia store for articles, likes/dislikes, and reading list (saved article IDs).
  * Hydrated from useArticles() on list/detail/saved pages.
- * Reading list IDs persist via pinia-plugin-persistedstate (paths: savedArticleIds).
+ * Reading list IDs persist via `saved-article-ids` cookie (see plugins/reading-list-cookie.ts).
  */
 
 import { defineStore } from 'pinia'
@@ -204,9 +204,5 @@ export const useArticlesStore = defineStore('articles', {
       this.scheduledRemovalIds = this.scheduledRemovalIds.filter((x) => x !== id)
       this.savedArticleIds = this.savedArticleIds.filter((x) => x !== id)
     },
-  },
-
-  persist: {
-    paths: ['savedArticleIds'],
   },
 })

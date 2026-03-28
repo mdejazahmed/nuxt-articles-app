@@ -122,9 +122,9 @@ const orphanSavedIds = computed((): string[] => {
   return store.savedArticleIds.filter((id) => !known.has(id))
 })
 
-async function removeOrphan(articleId: string): Promise<void> {
+function removeOrphan(articleId: string): void {
   if (store.isSaved(articleId)) {
-    await toggleSaveImmediate(articleId)
+    toggleSaveImmediate(articleId)
   }
 }
 </script>
